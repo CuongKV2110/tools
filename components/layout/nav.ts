@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   PenLine,
+  KanbanSquare,
   Flame,
   Fingerprint,
   Clapperboard,
@@ -28,6 +29,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/create",
     icon: PenLine,
     match: (p) => p.startsWith("/create"),
+  },
+  {
+    label: "Quản lý Content",
+    href: "/board",
+    icon: KanbanSquare,
+    match: (p) => p.startsWith("/board"),
   },
   {
     label: "Concept viral",
@@ -59,6 +66,7 @@ export const NAV_ITEMS: NavItem[] = [
 export const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Tổng quan",
   "/create": "Tạo Content AI",
+  "/board": "Quản lý Content",
   "/concepts": "Concept viral",
   "/material": "Chất liệu bản thân",
   "/script": "Kịch bản video",

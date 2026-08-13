@@ -5,7 +5,7 @@ import { MoreHorizontal, Eye, Trash2, ExternalLink } from "lucide-react";
 import type { Timestamp } from "firebase/firestore";
 import { getTopic } from "@/lib/topics";
 import { getConcept } from "@/lib/concepts";
-import { statusMeta } from "@/lib/constants";
+import { statusMeta, cleanTitle } from "@/lib/constants";
 import type { ContentDoc } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -98,7 +98,7 @@ export function ContentTable({
                     href={`/create/${c.id}`}
                     className="line-clamp-1 font-medium hover:text-primary"
                   >
-                    {c.title}
+                    {cleanTitle(c.title)}
                   </Link>
                   <span className="line-clamp-1 text-xs text-muted-foreground">
                     {getTopic(c.topicId)?.name}
@@ -175,7 +175,7 @@ export function ContentGrid({
               </div>
               <Link href={`/create/${c.id}`} className="flex-1">
                 <h3 className="line-clamp-2 font-semibold leading-snug hover:text-primary">
-                  {c.title}
+                  {cleanTitle(c.title)}
                 </h3>
                 <p className="mt-1.5 line-clamp-3 text-sm text-muted-foreground">
                   {c.rawInput}

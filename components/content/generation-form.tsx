@@ -232,7 +232,7 @@ export function GenerationForm() {
         formula,
         tone,
         length,
-        status: "draft",
+        status: "idea",
         publicUrl: null,
         wordCount: countWords(output),
         model: DEFAULT_CONTENT_MODEL,

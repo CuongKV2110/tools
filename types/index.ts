@@ -19,7 +19,7 @@ export interface AppUser {
 /* ------------------------------------------------------------------ */
 /*  Content generation                                                 */
 /* ------------------------------------------------------------------ */
-export type ContentStatus = "draft" | "published" | "archived";
+export type ContentStatus = "idea" | "pending" | "progress" | "done";
 export type ContentLength = "short" | "medium" | "long";
 export type ContentTone =
   | "friendly"

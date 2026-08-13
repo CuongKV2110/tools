@@ -258,6 +258,53 @@
   transform: scale(0.97);
 }
 
+/* Panning animated gradient (hero banner background) */
+@keyframes gradient-pan {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-pan 8s ease infinite;
+}
+
+/* Soft pulsing glow for decorative orbs */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
+}
+.animate-glow {
+  animation: glow-pulse 6s ease-in-out infinite;
+}
+
+/* Sheen sweep across a surface */
+@keyframes sheen {
+  0% {
+    transform: translateX(-120%) skewX(-15deg);
+  }
+  60%,
+  100% {
+    transform: translateX(220%) skewX(-15deg);
+  }
+}
+.animate-sheen {
+  animation: sheen 3.5s ease-in-out infinite;
+}
+
 /* Reduced motion: respect user preference */
 @media (prefers-reduced-motion: reduce) {
   *,

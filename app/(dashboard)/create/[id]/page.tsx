@@ -22,7 +22,12 @@ import {
 import { Markdown } from "@/components/content/markdown-preview";
 import { getTopic } from "@/lib/topics";
 import { getConcept } from "@/lib/concepts";
-import { STATUS_OPTIONS, statusMeta, countWords } from "@/lib/constants";
+import {
+  STATUS_OPTIONS,
+  statusMeta,
+  countWords,
+  cleanTitle,
+} from "@/lib/constants";
 import type { ContentStatus } from "@/types";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -67,13 +72,13 @@ export default function ContentDetailPage() {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [status, setStatus] = useState<ContentStatus>("draft");
+  const [status, setStatus] = useState<ContentStatus>("idea");
   const [saving, setSaving] = useState(false);
 
   // Sync local edit state whenever the doc loads/changes (and not mid-edit).
   useEffect(() => {
     if (content && !editing) {
-      setTitle(content.title);
+      setTitle(cleanTitle(content.title));
       setBody(content.body);
       setStatus(content.status);
     }
@@ -282,7 +287,7 @@ export default function ContentDetailPage() {
           ) : (
             <>
               <h1 className="text-2xl font-bold tracking-tight">
-                {content.title}
+                {cleanTitle(content.title)}
               </h1>
               <div className="h-px bg-border" />
               <Markdown content={content.body} />

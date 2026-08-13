@@ -10,14 +10,13 @@ import {
   FileText,
   CheckCircle2,
   PencilLine,
-  Archive,
+  Lightbulb,
   LayoutGrid,
-  LayoutDashboard,
   Table as TableIcon,
 } from "lucide-react";
 import { useContents, deleteContent } from "@/hooks/use-contents";
 import { ContentTable, ContentGrid } from "@/components/content/content-table";
-import { PageHeader } from "@/components/layout/page-header";
+import { WelcomeBanner } from "@/components/dashboard/welcome-banner";
 import { CONCEPTS } from "@/lib/concepts";
 import { STATUS_OPTIONS } from "@/lib/constants";
 import type { ContentStatus } from "@/types";
@@ -90,9 +89,9 @@ export default function DashboardPage() {
   const stats = useMemo(
     () => ({
       total: contents.length,
-      published: contents.filter((c) => c.status === "published").length,
-      draft: contents.filter((c) => c.status === "draft").length,
-      archived: contents.filter((c) => c.status === "archived").length,
+      done: contents.filter((c) => c.status === "done").length,
+      progress: contents.filter((c) => c.status === "progress").length,
+      idea: contents.filter((c) => c.status === "idea").length,
     }),
     [contents]
   );
@@ -126,17 +125,8 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      {/* Header */}
-      <PageHeader
-        icon={LayoutDashboard}
-        title="Tổng quan"
-        subtitle="Quản lý toàn bộ nội dung bạn đã tạo."
-      >
-        <Link href="/create" className={cn(buttonVariants())}>
-          <Plus className="size-4" />
-          Tạo Content
-        </Link>
-      </PageHeader>
+      {/* Hero banner + slider */}
+      <WelcomeBanner />
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -149,23 +139,23 @@ export default function DashboardPage() {
         />
         <StatCard
           index={1}
-          label="Đã xuất bản"
-          value={stats.published}
+          label="Hoàn thành"
+          value={stats.done}
           icon={CheckCircle2}
           tint="bg-emerald-50 text-emerald-600"
         />
         <StatCard
           index={2}
-          label="Bản nháp"
-          value={stats.draft}
+          label="Đang làm"
+          value={stats.progress}
           icon={PencilLine}
-          tint="bg-amber-50 text-amber-600"
+          tint="bg-blue-50 text-blue-600"
         />
         <StatCard
           index={3}
-          label="Lưu trữ"
-          value={stats.archived}
-          icon={Archive}
+          label="Ý tưởng"
+          value={stats.idea}
+          icon={Lightbulb}
           tint="bg-violet-50 text-violet-600"
         />
       </div>

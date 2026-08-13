@@ -23,24 +23,42 @@ export const STATUS_OPTIONS: {
   className: string;
 }[] = [
   {
-    value: "draft",
-    label: "Nháp",
+    value: "idea",
+    label: "Ý tưởng",
     className: "bg-slate-100 text-slate-700 border-slate-200",
   },
   {
-    value: "published",
-    label: "Đã xuất bản",
-    className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    value: "pending",
+    label: "Chờ xử lý",
+    className: "bg-amber-50 text-amber-700 border-amber-200",
   },
   {
-    value: "archived",
-    label: "Lưu trữ",
-    className: "bg-amber-50 text-amber-700 border-amber-200",
+    value: "progress",
+    label: "Đang làm",
+    className: "bg-blue-50 text-blue-700 border-blue-200",
+  },
+  {
+    value: "done",
+    label: "Hoàn thành",
+    className: "bg-emerald-50 text-emerald-700 border-emerald-200",
   },
 ];
 
 export const statusMeta = (status: ContentStatus) =>
   STATUS_OPTIONS.find((s) => s.value === status) ?? STATUS_OPTIONS[0];
+
+/** Strip inline Markdown markers (**bold**, *italic*, `code`, ~~strike~~, #) so
+ *  a plain-text title displays real characters, not the syntax. */
+export function cleanTitle(text: string): string {
+  return text
+    .replace(/^#{1,6}\s+/, "") // leading heading hashes
+    .replace(/(\*\*|__)(.*?)\1/g, "$2") // bold
+    .replace(/(\*|_)(.*?)\1/g, "$2") // italic
+    .replace(/~~(.*?)~~/g, "$1") // strikethrough
+    .replace(/`([^`]+)`/g, "$1") // inline code
+    .replace(/[*_`~]/g, "") // any leftover stray markers
+    .trim();
+}
 
 /** Derive a title from generated markdown (first heading) or fall back. */
 export function deriveTitle(markdown: string, fallback: string): string {
@@ -48,9 +66,9 @@ export function deriveTitle(markdown: string, fallback: string): string {
     .split("\n")
     .map((l) => l.trim())
     .find((l) => /^#{1,3}\s+/.test(l));
-  if (heading) return heading.replace(/^#{1,3}\s+/, "").slice(0, 120);
+  if (heading) return cleanTitle(heading).slice(0, 120);
   const firstLine = markdown.trim().split("\n")[0]?.trim();
-  if (firstLine) return firstLine.slice(0, 120);
+  if (firstLine) return cleanTitle(firstLine).slice(0, 120);
   return fallback.slice(0, 120) || "Nội dung chưa đặt tên";
 }
 
@@ -99,11 +117,12 @@ export function parseHooks(hooks: string): string[] {
   return hooks
     .split("\n")
     .map((l) =>
-      l
-        .replace(/^\s*\d+[.)]\s*/, "")
-        .replace(/^\s*[-*]\s*/, "")
-        .replace(/^\s*["“”']+|["“”']+\s*$/g, "")
-        .trim()
+      cleanTitle(
+        l
+          .replace(/^\s*\d+[.)]\s*/, "") // "1." / "1)" numbering
+          .replace(/^\s*[-*]\s*/, "") // bullet marker
+          .replace(/^\s*["“”']+|["“”']+\s*$/g, "") // wrapping quotes
+      )
     )
     .filter(Boolean)
     .slice(0, 8);
