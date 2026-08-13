@@ -10,9 +10,11 @@ import {
 } from "react";
 import {
   createUserWithEmailAndPassword,
+  getRedirectResult,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut as firebaseSignOut,
   updateProfile,
   type User,
@@ -89,6 +91,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Complete a redirect-based Google sign-in when the user lands back on the app.
+  useEffect(() => {
+    getRedirectResult(auth).catch((err) =>
+      console.error("Google redirect sign-in failed", err)
+    );
+  }, []);
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       setUser(fbUser);
@@ -120,7 +129,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const signInGoogle = useCallback(async () => {
-    await signInWithPopup(auth, googleProvider);
+    // Prefer popup for a smoother UX, but fall back to a full-page redirect
+    // whenever the popup can't complete — it may be blocked, or Chrome's
+    // Cross-Origin-Opener-Policy can prevent the popup result from ever
+    // reaching the opener, leaving the promise pending forever.
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      const code = (err as { code?: string })?.code ?? "";
+      const popupFailed =
+        code === "auth/popup-blocked" ||
+        code === "auth/popup-closed-by-user" ||
+        code === "auth/cancelled-popup-request" ||
+        code === "auth/operation-not-supported-in-this-environment";
+      if (popupFailed) {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      }
+      throw err;
+    }
   }, []);
 
   const signOut = useCallback(async () => {
