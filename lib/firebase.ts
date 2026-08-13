@@ -12,16 +12,27 @@ import { getStorage } from "firebase/storage";
  * NEXT_PUBLIC_* values (inlined at build time) are used. Configure them in
  * `.env.local` before deploying — see `.env.example`.
  */
+// The Firebase client config is PUBLIC by design — it ships to every browser
+// and security is enforced by Firestore/Storage rules, not by hiding these
+// values. We keep the real project values as defaults so client auth works
+// even when the NEXT_PUBLIC_* build-time env vars are missing (e.g. when they
+// are marked "Sensitive" on the host and therefore not inlined into the bundle).
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-api-key",
+  apiKey:
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+    "AIzaSyDYaOPAqQe154trbJTNNzqqAvJVmOVGoKk",
   authDomain:
-    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "demo.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "demo-project",
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+    "tools-27e02.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "tools-27e02",
   storageBucket:
-    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "demo.appspot.com",
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    "tools-27e02.firebasestorage.app",
   messagingSenderId:
-    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "000000000000",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:0:web:0",
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "490212175249",
+  appId:
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID ||
+    "1:490212175249:web:1c7065f0390465a5e1be30",
 };
 
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
