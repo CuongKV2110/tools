@@ -73,8 +73,8 @@ export default function AuthLayout({
               <span className="text-cyan-200">bùng nổ view</span> trong vài phút.
             </h1>
             <p className="max-w-md text-white/80">
-              Viết nội dung đúng phong cách với Persona và công thức kể chuyện
-              của riêng bạn, rồi quản lý mọi thứ ở một nơi.
+              Viết nội dung đúng phong cách và công thức kể chuyện của riêng
+              bạn, rồi quản lý mọi thứ ở một nơi.
             </p>
           </div>
 
