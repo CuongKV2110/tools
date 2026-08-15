@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Markdown } from "@/components/content/markdown-preview";
+import { CollapsibleSections } from "@/components/content/collapsible-sections";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -202,7 +203,11 @@ export function MaterialForm() {
           </div>
 
           {hasOutput ? (
-            <Markdown content={output} />
+            isStreaming ? (
+              <Markdown content={output} />
+            ) : (
+              <CollapsibleSections content={output} />
+            )
           ) : (
             <div className="flex h-56 flex-col items-center justify-center gap-3 text-center text-muted-foreground">
               <div className="flex size-12 items-center justify-center rounded-2xl bg-accent">

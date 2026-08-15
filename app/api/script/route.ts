@@ -1,7 +1,11 @@
 import type { NextRequest } from "next/server";
 import { streamText } from "ai";
 import { contentModel, isAIConfigured } from "@/lib/ai";
-import { buildScriptSystemPrompt, buildScriptPrompt } from "@/lib/prompts";
+import {
+  buildScriptSystemPrompt,
+  buildAnalysisPrompt,
+  buildScriptsPrompt,
+} from "@/lib/prompts";
 import { verifyRequest } from "@/lib/auth-helpers";
 import type { VideoScriptRequest } from "@/types";
 
@@ -28,11 +32,13 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  const isScripts = body.mode === "scripts";
   const result = streamText({
     model: contentModel,
     system: buildScriptSystemPrompt(),
-    prompt: buildScriptPrompt(body),
+    prompt: isScripts ? buildScriptsPrompt(body) : buildAnalysisPrompt(body),
     temperature: 0.8,
+    maxOutputTokens: 16384,
   });
 
   return result.toTextStreamResponse();

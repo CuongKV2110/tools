@@ -109,7 +109,9 @@ export function ContentBoard({
                     </p>
                     <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
                       <span className="line-clamp-1">
-                        {topic?.emoji} {concept?.name}
+                        {c.kind === "script"
+                          ? "🎬 Kịch bản"
+                          : `${topic?.emoji ?? ""} ${concept?.name ?? ""}`}
                       </span>
                       <span className="shrink-0">{formatDate(c.createdAt)}</span>
                     </div>

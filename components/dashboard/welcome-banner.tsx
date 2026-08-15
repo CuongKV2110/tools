@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Sparkles,
@@ -9,12 +10,29 @@ import {
   Clapperboard,
   Fingerprint,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-/** Rotating highlights shown in the banner slider. */
-const SLIDES = [
+type Slide =
+  | { type: "image"; src: string; href?: string; alt: string }
+  | {
+      type: "feature";
+      icon: typeof Flame;
+      title: string;
+      desc: string;
+      href: string;
+      cta: string;
+    };
+
+/** Rotating slides shown in the banner: image banners + feature highlights. */
+const SLIDES: Slide[] = [
+  { type: "image", src: "/banner1.png", href: "/create", alt: "Banner 1" },
+  { type: "image", src: "/banner3.jpg", href: "/concepts", alt: "Banner 3" },
+  { type: "image", src: "/banner4.jpg", href: "/material", alt: "Banner 4" },
   {
+    type: "feature",
     icon: Flame,
     title: "Concept viral có sẵn",
     desc: "Chọn công thức kể chuyện đang bùng nổ, chỉ việc điền ý tưởng.",
@@ -22,6 +40,7 @@ const SLIDES = [
     cta: "Khám phá concept",
   },
   {
+    type: "feature",
     icon: Fingerprint,
     title: "Chất liệu bản thân",
     desc: "Phân tích chân dung khách hàng để nội dung chạm đúng nỗi đau.",
@@ -29,13 +48,14 @@ const SLIDES = [
     cta: "Phân tích ngay",
   },
   {
+    type: "feature",
     icon: Clapperboard,
     title: "Kịch bản video HILLA",
     desc: "Biến insight thành kịch bản Reels/TikTok đọc thẳng trước camera.",
     href: "/script",
     cta: "Viết kịch bản",
   },
-] as const;
+];
 
 function greeting(): string {
   // Static (build-safe) greeting — avoids Date usage at module scope.
@@ -56,8 +76,6 @@ export function WelcomeBanner() {
     }, 5000);
     return () => clearInterval(t);
   }, []);
-
-  const Icon = slide.icon;
 
   return (
     <motion.div
@@ -99,45 +117,83 @@ export function WelcomeBanner() {
         </div>
 
         {/* Slider */}
-        <div className="w-full max-w-sm">
-          <div className="relative min-h-[120px] rounded-xl bg-white/10 p-4 backdrop-blur-md ring-1 ring-white/20">
+        <div className="group/slider w-full lg:w-[440px]">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-white/10 shadow-soft-lg ring-1 ring-white/25 backdrop-blur-md">
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0"
               >
-                <div className="flex items-start gap-3">
-                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-white/20">
-                    <Icon className="size-5" />
+                {slide.type === "image" ? (
+                  <Link
+                    href={slide.href ?? "#"}
+                    className="group relative block h-full"
+                  >
+                    <Image
+                      src={slide.src}
+                      alt={slide.alt}
+                      fill
+                      sizes="440px"
+                      className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-110"
+                    />
+                    {/* subtle gradient for depth */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+                  </Link>
+                ) : (
+                  <div className="flex h-full flex-col justify-center gap-3 bg-white/5 p-5">
+                    <div className="flex size-11 items-center justify-center rounded-xl bg-white/20">
+                      <slide.icon className="size-5" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold">{slide.title}</p>
+                      <p className="mt-1 text-sm text-white/80">{slide.desc}</p>
+                      <Link
+                        href={slide.href}
+                        className="mt-3 inline-flex items-center gap-1 rounded-lg bg-white/15 px-3 py-1.5 text-xs font-medium text-white ring-1 ring-white/20 transition-colors hover:bg-white/25"
+                      >
+                        {slide.cta}
+                        <ArrowRight className="size-3.5" />
+                      </Link>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold">{slide.title}</p>
-                    <p className="mt-0.5 text-xs text-white/80">{slide.desc}</p>
-                    <Link
-                      href={slide.href}
-                      className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-white hover:underline"
-                    >
-                      {slide.cta}
-                      <ArrowRight className="size-3.5" />
-                    </Link>
-                  </div>
-                </div>
+                )}
               </motion.div>
             </AnimatePresence>
+
+            {/* Prev / Next controls (appear on hover) */}
+            <button
+              aria-label="Trước"
+              onClick={() =>
+                setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
+              }
+              className="absolute left-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white opacity-0 backdrop-blur-sm transition-opacity hover:bg-black/50 group-hover/slider:opacity-100"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <button
+              aria-label="Sau"
+              onClick={() => setIndex((i) => (i + 1) % SLIDES.length)}
+              className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white opacity-0 backdrop-blur-sm transition-opacity hover:bg-black/50 group-hover/slider:opacity-100"
+            >
+              <ChevronRight className="size-4" />
+            </button>
           </div>
 
           {/* Slider dots */}
-          <div className="mt-3 flex items-center justify-center gap-2">
+          <div className="mt-3 flex items-center justify-center gap-1.5">
             {SLIDES.map((_, i) => (
               <button
                 key={i}
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => setIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-6 bg-white" : "w-1.5 bg-white/40"
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === index
+                    ? "w-6 bg-white"
+                    : "w-1.5 bg-white/40 hover:bg-white/70"
                 }`}
               />
             ))}

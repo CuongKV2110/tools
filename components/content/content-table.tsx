@@ -105,7 +105,11 @@ export function ContentTable({
                   </span>
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  {concept ? (
+                  {c.kind === "script" ? (
+                    <span className="text-sm text-muted-foreground">
+                      🎬 Kịch bản
+                    </span>
+                  ) : concept ? (
                     <span className="text-sm text-muted-foreground">
                       {concept.emoji} {concept.name}
                     </span>

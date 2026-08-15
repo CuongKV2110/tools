@@ -31,6 +31,8 @@ export type ContentTone =
 export interface ContentDoc {
   id: string;
   ownerId: string;
+  /** Loại nội dung: bài viết thường hay kịch bản video đã lưu. */
+  kind?: "content" | "script";
   title: string;
   rawInput: string;
   body: string;
@@ -78,8 +80,15 @@ export interface MaterialRequest {
 export interface VideoScriptRequest {
   /** Chân dung khách hàng mục tiêu (dán từ "Chất liệu bản thân" hoặc tự nhập). */
   customerPortrait: string;
-  /** Ngành nghề + số năm kinh nghiệm — quyết định giọng viết. */
-  industry: string;
+  /** Tóm tắt / định hướng kịch bản người dùng muốn tạo (chủ đề, thông điệp…). */
+  summary: string;
+  /**
+   * Bước cần chạy: "analysis" = phân tích nỗi đau + mong muốn (mặc định),
+   * "scripts" = viết 3 kịch bản HILLA dựa trên phần phân tích.
+   */
+  mode?: "analysis" | "scripts";
+  /** Kết quả phân tích ở bước 1 — truyền vào khi mode = "scripts". */
+  analysis?: string;
 }
 
 /* ------------------------------------------------------------------ */

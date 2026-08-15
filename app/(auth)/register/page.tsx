@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { authErrorMessage } from "@/lib/firebase-errors";
 import { GoogleButton } from "@/components/auth/google-button";
@@ -60,9 +60,12 @@ export default function RegisterPage() {
     <div className="space-y-6">
       <div className="space-y-2">
         <div className="flex items-center gap-2 lg:hidden">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Sparkles className="size-5" />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png?v=2"
+            alt="Content Support"
+            className="size-9 rounded-xl object-contain"
+          />
           <span className="text-lg font-semibold">Content Support</span>
         </div>
         <h1 className="text-2xl font-bold tracking-tight">Tạo tài khoản</h1>

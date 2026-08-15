@@ -2,9 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { PenLine, Lightbulb, Target, Quote, FileText } from "lucide-react";
+import {
+  PenLine,
+  Lightbulb,
+  Layers,
+  ListChecks,
+  Quote,
+  Sparkles,
+  Type,
+  PlusCircle,
+} from "lucide-react";
 import { conceptsByGroup, CONCEPT_GROUPS } from "@/lib/concepts";
 import { getConceptDetail } from "@/lib/concept-details";
+import { Markdown } from "@/components/content/markdown-preview";
 import type { Concept } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +26,34 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+function DetailSection({
+  icon: Icon,
+  title,
+  highlight,
+  children,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  highlight?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      className={
+        highlight
+          ? "rounded-xl border border-primary/20 bg-accent/50 p-4"
+          : "rounded-xl border border-border bg-card p-4"
+      }
+    >
+      <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
+        <Icon className="size-4 text-primary" />
+        {title}
+      </p>
+      <div className="text-sm leading-6 text-foreground/90">{children}</div>
+    </section>
+  );
+}
 
 export function ConceptLibrary() {
   const router = useRouter();
@@ -86,59 +124,63 @@ export function ConceptLibrary() {
               </div>
 
               <div className="space-y-5 p-6 pt-5">
-                {/* 2 cột: vì sao viral + khi nào dùng */}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <section className="rounded-xl border border-border bg-card p-4">
-                    <p className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold">
-                      <Lightbulb className="size-4 text-primary" />
-                      Vì sao dễ viral
-                    </p>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      {detail.whyViral}
-                    </p>
-                  </section>
-                  <section className="rounded-xl border border-border bg-card p-4">
-                    <p className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold">
-                      <Target className="size-4 text-primary" />
-                      Khi nào nên dùng
-                    </p>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      {detail.whenToUse}
-                    </p>
-                  </section>
-                </div>
+                {detail.principle && (
+                  <DetailSection icon={Lightbulb} title="Nguyên tắc chung">
+                    <Markdown content={detail.principle} />
+                  </DetailSection>
+                )}
 
-                {/* Ví dụ hook */}
-                <section className="space-y-2">
-                  <p className="flex items-center gap-1.5 text-sm font-semibold">
-                    <Quote className="size-4 text-primary" />
-                    Ví dụ tiêu đề / hook ({detail.examples.length})
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    {detail.examples.map((ex, i) => (
-                      <div
-                        key={i}
-                        className="flex gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-sm"
-                      >
-                        <span className="font-semibold text-primary">
-                          {i + 1}.
-                        </span>
-                        <span className="italic">“{ex}”</span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                {detail.forms && (
+                  <DetailSection icon={Layers} title="Những dạng triển khai">
+                    <Markdown content={detail.forms} />
+                  </DetailSection>
+                )}
 
-                {/* Câu chuyện demo */}
-                <section className="space-y-2">
-                  <p className="flex items-center gap-1.5 text-sm font-semibold">
-                    <FileText className="size-4 text-primary" />
-                    Câu chuyện demo — cách triển khai
-                  </p>
-                  <p className="rounded-xl border border-primary/20 bg-accent/50 p-4 text-sm leading-7 text-foreground/90">
-                    {detail.demo}
-                  </p>
-                </section>
+                {detail.format && (
+                  <DetailSection icon={ListChecks} title="Cách triển khai">
+                    <Markdown content={detail.format} />
+                  </DetailSection>
+                )}
+
+                {detail.keywords && (
+                  <DetailSection
+                    icon={Sparkles}
+                    title="Điểm hút view / keyword thành công"
+                    highlight
+                  >
+                    <Markdown content={detail.keywords} />
+                  </DetailSection>
+                )}
+
+                {detail.examples && (
+                  <DetailSection
+                    icon={Quote}
+                    title="Ví dụ thực tế & nguồn tham khảo"
+                  >
+                    <Markdown content={detail.examples} />
+                  </DetailSection>
+                )}
+
+                {detail.titles.length > 0 && (
+                  <DetailSection icon={Type} title="Gợi ý tiêu đề">
+                    <ul className="space-y-1.5">
+                      {detail.titles.map((t, i) => (
+                        <li key={i} className="flex gap-2 text-sm">
+                          <span className="font-semibold text-primary">
+                            {i + 1}.
+                          </span>
+                          <span>{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </DetailSection>
+                )}
+
+                {detail.application && (
+                  <DetailSection icon={PlusCircle} title="Ứng dụng thêm">
+                    <Markdown content={detail.application} />
+                  </DetailSection>
+                )}
 
                 <Button
                   size="lg"

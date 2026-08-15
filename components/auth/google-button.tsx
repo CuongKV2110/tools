@@ -16,7 +16,7 @@ export function GoogleButton({
     <Button
       type="button"
       variant="outline"
-      className="w-full"
+      className="h-12 w-full text-base font-medium shadow-soft transition-all hover:bg-accent hover:shadow-soft-lg"
       onClick={onClick}
       disabled={loading}
     >

@@ -1,6 +1,6 @@
 import type { Concept } from "@/types";
 
-/** Nhóm concept (bộ concept viral / DNA Viral). */
+/** Nhóm concept viral — dữ liệu đồng bộ từ Google Sheet "Concept Viral". */
 export const CONCEPT_GROUPS: { id: string; label: string }[] = [
   { id: "value", label: "Giá trị & Thực tiễn" },
   { id: "emotion", label: "Tâm lý & Cảm xúc" },
@@ -9,235 +9,299 @@ export const CONCEPT_GROUPS: { id: string; label: string }[] = [
 ];
 
 export const CONCEPTS: Concept[] = [
-  /* -------------------- Giá trị & Thực tiễn -------------------- */
   {
-    id: "compare",
+    id: "so-sanh-an-du",
     name: "So sánh / Ẩn dụ",
     emoji: "🔀",
-    description: "Đặt hai đối tượng cạnh nhau tạo góc nhìn mới.",
+    description: "So Sánh sản phẩm có điểm chung (Cùng phân khúc giá/ Cùng Màu/ Cùng Chất liệu/ Cùng hãng/Công dụng/ Tính năng/ vùng…",
     group: "value",
-    promptFragment:
-      "Triển khai theo hướng SO SÁNH / LIÊN TƯỞNG / ẨN DỤ: đặt hai đối tượng trái ngược hoặc tương đồng cạnh nhau để làm bật thông điệp, tạo góc nhìn mới lạ.",
+    promptFragment: "Triển khai theo concept \"So sánh / Ẩn dụ\": So Sánh sản phẩm có điểm chung (Cùng phân khúc giá/ Cùng Màu/ Cùng Chất liệu/ Cùng hãng/Công dụng/ Tính năng/ vùng miền/Thế hệ...) => Nhưng đưa ra điểm khác biệt",
   },
   {
-    id: "howto",
-    name: "Hữu ích thông dụng",
-    emoji: "🛠️",
-    description: "Hướng dẫn từng bước, mẹo giải quyết vấn đề nhanh.",
-    group: "value",
-    promptFragment:
-      "Triển khai kiểu HỮU ÍCH THÔNG DỤNG: đưa hướng dẫn từng bước, mẹo vặt giải quyết vấn đề nhanh gọn, thực dụng, người đọc áp dụng được ngay.",
-  },
-  {
-    id: "last-minute",
-    name: "Lợi ích phút chót",
-    emoji: "⏳",
-    description: "Dồn phần thưởng hấp dẫn nhất xuống cuối để giữ chân.",
-    group: "value",
-    promptFragment:
-      "Triển khai kiểu LỢI ÍCH PHÚT CHÓT: dồn kết quả/phần thưởng hấp dẫn nhất xuống cuối, gieo tò mò xuyên suốt để giữ chân người đọc tới phút chót.",
-  },
-  {
-    id: "experience",
-    name: "Kinh nghiệm thực tiễn",
-    emoji: "🧭",
-    description: "Kể bài học xương máu, câu chuyện làm nghề.",
-    group: "value",
-    promptFragment:
-      "Triển khai kiểu CHIA SẺ KINH NGHIỆM THỰC TIỄN: kể bài học xương máu / câu chuyện làm nghề của bản thân với chi tiết thật, rồi rút ra bài học ứng dụng được.",
-  },
-  {
-    id: "diy",
-    name: "DIY – Tự làm",
-    emoji: "🧰",
-    description: "Hướng dẫn tự làm với nguyên liệu dễ kiếm.",
-    group: "value",
-    promptFragment:
-      "Triển khai kiểu DIY (TỰ LÀM TẠI NHÀ): hướng dẫn tự làm đồ vật/món ăn với nguyên liệu dễ kiếm, các bước rõ ràng, dễ làm theo.",
-  },
-  {
-    id: "educational",
-    name: "Giảng dạy / Kiến thức",
-    emoji: "🧠",
-    description: "Truyền đạt kiến thức rõ ràng, có cấu trúc.",
-    group: "value",
-    promptFragment:
-      "Kể theo hướng giảng dạy: trình bày có cấu trúc, giải thích khái niệm rõ ràng, kèm ví dụ và điểm mấu chốt dễ nhớ.",
-  },
-  {
-    id: "seo",
-    name: "Chuẩn SEO",
-    emoji: "🔍",
-    description: "Tối ưu tìm kiếm: heading, từ khoá, dễ đọc.",
-    group: "value",
-    promptFragment:
-      "Viết chuẩn SEO: dùng tiêu đề và heading (H2/H3) hợp lý, đưa từ khoá chính một cách tự nhiên, chia đoạn ngắn dễ đọc, có mở đầu thu hút và kết luận rõ ràng.",
-  },
-
-  /* -------------------- Tâm lý & Cảm xúc -------------------- */
-  {
-    id: "emotional",
-    name: "Cảm xúc / Hoài niệm",
-    emoji: "💭",
-    description: "Chạm tới cảm xúc, gợi ký ức và sự đồng cảm.",
-    group: "emotion",
-    promptFragment:
-      "Kể theo hướng cảm xúc và hoài niệm: khơi gợi ký ức, sự ấm áp và đồng cảm, dùng chi tiết nhỏ để chạm tới trái tim người đọc.",
-  },
-  {
-    id: "controversy",
-    name: "Gây tranh cãi",
-    emoji: "🔥",
-    description: "Quan điểm trái chiều kích thích bình luận.",
-    group: "emotion",
-    promptFragment:
-      "Triển khai kiểu GÂY TRANH CÃI / ỨC CHẾ: đưa ra quan điểm trái chiều, đặt vấn đề kích thích bình luận — nhưng giữ văn minh, không xúc phạm cá nhân, không kích động thù ghét.",
-  },
-  {
-    id: "consensus",
-    name: "Ủng hộ số đông",
-    emoji: "👍",
-    description: "Nói lên điều nhiều người đang nghĩ.",
-    group: "emotion",
-    promptFragment:
-      "Triển khai kiểu ỦNG HỘ SỐ ĐÔNG: đứng về phía luồng ý kiến đồng thuận lớn của cộng đồng, khẳng định điều nhiều người đang nghĩ để tạo đồng cảm và chia sẻ.",
-  },
-  {
-    id: "warning",
-    name: "Cảnh báo / Sợ hãi",
-    emoji: "⚠️",
-    description: "Thông tin rủi ro tạo chú ý cấp bách.",
-    group: "emotion",
-    promptFragment:
-      "Triển khai kiểu CẢNH BÁO / SỢ HÃI: nêu rủi ro, hiểm họa, hậu quả để tạo chú ý cấp bách; kèm giải pháp/cách phòng tránh, tuyệt đối không hù dọa sai sự thật.",
-  },
-  {
-    id: "touching",
-    name: "Cảm động / Nhân văn",
-    emoji: "🥹",
-    description: "Chạm lòng trắc ẩn, tình cảm gia đình.",
-    group: "emotion",
-    promptFragment:
-      "Triển khai kiểu CẢM ĐỘNG / NHÂN VĂN: chạm tới lòng trắc ẩn, tình cảm gia đình, sự biết ơn; dùng chi tiết nhỏ giàu cảm xúc để lay động người đọc.",
-  },
-  {
-    id: "humorous",
-    name: "Hài hước / Châm biếm",
-    emoji: "😂",
-    description: "Tiếng cười, phóng đại để giảm căng thẳng.",
-    group: "emotion",
-    promptFragment:
-      "Kể theo hướng hài hước / châm biếm: dùng tiếng cười, phóng đại và tình huống duyên dáng để giảm căng thẳng và tăng chia sẻ, nhưng không lố.",
-  },
-  {
-    id: "spiritual",
-    name: "Tâm linh / Nhân quả",
-    emoji: "🔮",
-    description: "Niềm tin, chiêm tinh, luật nhân quả.",
-    group: "emotion",
-    promptFragment:
-      "Triển khai kiểu TÂM LINH / NHÂN QUẢ: khai thác niềm tin, chiêm tinh, luật nhân quả một cách nhẹ nhàng, tích cực; không mê tín cực đoan.",
-  },
-
-  /* -------------------- Trend & Thời gian thực -------------------- */
-  {
-    id: "hot-drama",
-    name: "Chủ đề HOT / Drama",
+    id: "chu-de-hot",
+    name: "Chủ đề Hot",
     emoji: "🌶️",
-    description: "Bám sự kiện đình đám đang được quan tâm.",
+    description: "Lựa chọn chủ đề Hot cần đạt những yêu cầu sau: - Lý do sinh ra phức tạp - Nhiều tệp biết đến và quan tâm - Thời gian…",
     group: "trend",
-    promptFragment:
-      "Triển khai kiểu CHỦ ĐỀ HOT / DRAMA: bám sát sự kiện đình đám đang được xã hội quan tâm, đưa góc nhìn riêng — tránh bịa đặt hoặc bôi nhọ.",
+    promptFragment: "Triển khai theo concept \"Chủ đề Hot\": Lựa chọn chủ đề Hot cần đạt những yêu cầu sau: - Lý do sinh ra phức tạp - Nhiều tệp biết đến và quan tâm - Thời gian tồn tại lâu - Có tính xã hội Ví dụ: - Tệp HS,SV: Tình yêu học đường, bạo lực học đường, - Tệp giới trẻ: Tình yêu( Phản bội, ngoại tình, người thứ 3- trà xanh...),Công việc: (Định hướng nghề nghiệp, ma cũ bắt nạt ma mới...), truyền động lực... - Tệp già hơn: Hôn nhân( Mẹ chồng nàng…",
   },
   {
-    id: "realtime",
-    name: "Realtime – Tin nóng",
-    emoji: "⚡",
-    description: "Cập nhật ngay sự kiện vừa xảy ra.",
-    group: "trend",
-    promptFragment:
-      "Triển khai kiểu REALTIME (TIN NÓNG THEO GIỜ): cập nhật ngay sự kiện vừa xảy ra với nhịp nhanh, ngắn gọn, đúng trọng tâm.",
+    id: "huu-ich-thong-dung",
+    name: "Hữu ích, thông dụng",
+    emoji: "🛠️",
+    description: "Thế nào là 1 content \"Thông dụng\": - Người xem cảm thấy mình đang hiện diện trong content đấy. - Đơn giản, dễ hiểu…",
+    group: "value",
+    promptFragment: "Triển khai theo concept \"Hữu ích, thông dụng\": Thế nào là 1 content \"Thông dụng\": - Người xem cảm thấy mình đang hiện diện trong content đấy. - Đơn giản, dễ hiểu - Lựa chọn những gì đưa lên content gần gũi, thân thuộc, gắn bó với khách hàng nhất - Mang lại giá trị với tệp khách hàng mục tiêu",
   },
   {
-    id: "trend",
-    name: "Bắt trend",
-    emoji: "🎵",
-    description: "Tận dụng âm thanh/định dạng đang thịnh hành.",
-    group: "trend",
-    promptFragment:
-      "Triển khai kiểu BẮT TREND: tận dụng định dạng / âm thanh / thử thách đang thịnh hành, gắn thông điệp của bạn vào trend một cách tự nhiên.",
-  },
-  {
-    id: "big-event",
-    name: "Sự kiện lớn trong năm",
-    emoji: "🎉",
-    description: "Gắn nội dung với lễ Tết, ngày hội mua sắm.",
-    group: "trend",
-    promptFragment:
-      "Triển khai kiểu SỰ KIỆN LỚN TRONG NĂM: gắn nội dung với dịp lễ Tết, ngày hội mua sắm lớn; khai thác cảm xúc và nhu cầu mùa vụ.",
-  },
-
-  /* -------------------- Khám phá & Độc lạ -------------------- */
-  {
-    id: "dramatic",
-    name: "Kịch tính",
-    emoji: "🎬",
-    description: "Tạo cao trào, mâu thuẫn và bất ngờ.",
-    group: "discover",
-    promptFragment:
-      "Kể theo hướng kịch tính: xây dựng căng thẳng, mâu thuẫn và cao trào, tạo nhịp điệu dồn dập và những khoảnh khắc bất ngờ.",
-  },
-  {
-    id: "kol",
-    name: "Người nổi tiếng / KOL",
+    id: "muon-nguoi-noi-tieng",
+    name: "Mượn người nổi tiếng",
     emoji: "🌟",
-    description: "Mượn hình ảnh, phát ngôn người ảnh hưởng.",
+    description: "Ai là người nổi tiếng: - Người chỉ có followers (Trai xinh, gái đẹp, hiện tượng mạng...): Thông soái ca- Không có sức…",
     group: "discover",
-    promptFragment:
-      "Triển khai kiểu NGƯỜI NỔI TIẾNG / KOL: mượn hình ảnh, phát ngôn hoặc câu chuyện của người có sức ảnh hưởng để dẫn dắt thông điệp; trích dẫn hợp lý, không mạo danh.",
+    promptFragment: "Triển khai theo concept \"Mượn người nổi tiếng\": Ai là người nổi tiếng: - Người chỉ có followers (Trai xinh, gái đẹp, hiện tượng mạng...): Thông soái ca- Không có sức ảnh hưởng=> Nổi lên trong 1 thời gian ngắn. - Đại diện cho 1 bộ phận chuyên trải nghiệm nhiều loại sản phẩm khác nhau: KOC - Người có tầm ảnh hưởng tới một bộ phận công chúng nhất định: KOL ( Thông thường là các chuyên gia, những người đứng đầu trong các lĩnh vực, hoặc những người…",
   },
   {
-    id: "journey",
+    id: "lon-cau-ky",
+    name: "Lớn & cầu kỳ",
+    emoji: "💎",
+    description: "Tất cả những gì có kích thước lớn, Có giá trị cao, Quý hiếm - Hoặc làm mọi thứ trở nên cầu kì, bày vẽ, làm quá => Đều…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Lớn & cầu kỳ\": Tất cả những gì có kích thước lớn, Có giá trị cao, Quý hiếm - Hoặc làm mọi thứ trở nên cầu kì, bày vẽ, làm quá => Đều thuộc concept Lớn",
+  },
+  {
+    id: "hanh-trinh",
     name: "Hành trình",
     emoji: "🚀",
-    description: "Câu chuyện lột xác từ số 0 đến thành công.",
+    description: "Lựa chọn chủ đề nhiều người mong muốn, khao khát nhưng thường khó thực hiện (VD: Thay đổi ngoại hình \"Giảm cân, làm…",
     group: "discover",
-    promptFragment:
-      "Triển khai kiểu HÀNH TRÌNH (JOURNEY): kể câu chuyện lột xác từ con số 0 đến thành công, có cao trào và bước ngoặt truyền cảm hứng.",
+    promptFragment: "Triển khai theo concept \"Hành trình\": Lựa chọn chủ đề nhiều người mong muốn, khao khát nhưng thường khó thực hiện (VD: Thay đổi ngoại hình \"Giảm cân, làm đẹp, chữa mụn, PTTM...\",Khởi nghiệp, sửa nhà, Học tập để đạt được thành tích đáng ngưỡng mộ,...) - Hành trình trải nghiệm gắn với những mốc thời gian cụ thể trong khoảng thời gian trải nghiệm.",
   },
   {
-    id: "weird",
-    name: "Độc & lạ / Kỳ quặc",
-    emoji: "🤯",
-    description: "Hiện tượng hiếm thấy, dị biệt, bất ngờ.",
-    group: "discover",
-    promptFragment:
-      "Triển khai kiểu ĐỘC & LẠ / KỲ QUẶC: khai thác hiện tượng hiếm thấy, dị biệt, bất ngờ ngoài đời thực để tạo tò mò mạnh.",
+    id: "cam-dong",
+    name: "Cảm động",
+    emoji: "🥹",
+    description: "Những vấn đề mang lại sự cảm động: - Chia ly: Sinh tử, rời xa người thân, đi xa vì mưu sinh, mất mát lớn lao. - Nghịch…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Cảm động\": Những vấn đề mang lại sự cảm động: - Chia ly: Sinh tử, rời xa người thân, đi xa vì mưu sinh, mất mát lớn lao. - Nghịch cảnh: Bệnh tật hiểm nghèo, nghèo khó, khuyết tật, bất công, trải qua giai đoạn khó khăn của cuộc đời - Nghèo khó: Thiệt thòi (kì thị, thiếu thốn,,,,), Cuộc sống mưu sinh vất vả,... - Khát vọng giản đơn: Mong muốn nhỏ bé nhưng khó đạt được như được yêu thương, đi học, có một mái…",
   },
   {
-    id: "secret",
-    name: "Bóc trần / Sự thật ngầm",
+    id: "con-so",
+    name: "Con số",
+    emoji: "🔢",
+    description: "Nhìn chung, concpept số là một concept không phải lúc nào cũng sẽ đứng riêng một mình mà thường kèm theo sau đó là sự…",
+    group: "value",
+    promptFragment: "Triển khai theo concept \"Con số\": Nhìn chung, concpept số là một concept không phải lúc nào cũng sẽ đứng riêng một mình mà thường kèm theo sau đó là sự kết hợp của các concept khác để tăng tính hiệu quả hơn. Đặc biệt nó không giới hạn trong lĩnh vực nào hết. Cấu trúc chung của concept \"số\": Cụm từ dẫn dắt + Con số + Chủ đề hoặc thông điệp / Con số + Chủ đề Lưu ý: Số lẻ như 5, 7, 9 thường tạo cảm giác không quá cố định và khiến…",
+  },
+  {
+    id: "real-time-tin-nong",
+    name: "Real Time – Tin nóng",
+    emoji: "⚡",
+    description: "Đối với concept này, thời gian là yếu tố quan trọng nhất. Càng sớm, càng đón đầu trước thì sẽ càng hiệu quả hơn rất…",
+    group: "trend",
+    promptFragment: "Triển khai theo concept \"Real Time – Tin nóng\": Đối với concept này, thời gian là yếu tố quan trọng nhất. Càng sớm, càng đón đầu trước thì sẽ càng hiệu quả hơn rất nhiều. Thông thường, nó chỉ được sinh ra khi toàn bộ xã hội hoặc một nhóm đối tượng đủ lớn đều cùng quan tâm chỉ duy nhất 1 sự việc/thông tin nào đó trong một thời gian cố định",
+  },
+  {
+    id: "tranh-cai",
+    name: "Tranh cãi",
+    emoji: "🔥",
+    description: "Mọi người chọn một chủ đề luôn có nhiều góc nhìn và quan điểm khác nhau, đặc biệt trong bài có những quan điểm chạm đến…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Tranh cãi\": Mọi người chọn một chủ đề luôn có nhiều góc nhìn và quan điểm khác nhau, đặc biệt trong bài có những quan điểm chạm đến “những chuyện khó” của cuộc sống. Vấn đề này tồn tại nhưng ít khi được bàn đến, vì nó tế nhị hoặc nó khó để giải quyết. Sau đấy đưa ra một quan điểm cá nhân với tính \"mới\". Mới ở đây có thể là góc nhìn mới, cách lập luận mới.",
+  },
+  {
+    id: "ung-ho-so-dong",
+    name: "Ủng hộ số đông",
+    emoji: "👍",
+    description: "Concept \"Ủng hộ Số Đông Dư Luận\" tập trung vào việc tận dụng sức mạnh của đám đông và xu hướng dư luận để gia tăng sự…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Ủng hộ số đông\": Concept \"Ủng hộ Số Đông Dư Luận\" tập trung vào việc tận dụng sức mạnh của đám đông và xu hướng dư luận để gia tăng sự chú ý, tính lan tỏa, và sự đồng thuận cho nội dung. Ý tưởng cốt lõi là đi theo hoặc đồng thuận với ý kiến mà số đông đang quan tâm hoặc ủng hộ, từ đó kích thích sự đồng cảm, chia sẻ, và thảo luận từ khán giả.",
+  },
+  {
+    id: "chuyen-te-nhi",
+    name: "Chuyện tế nhị",
+    emoji: "💋",
+    description: "Nguyên tắc của concept này đấy là làm sao để có thể kích hoạt được các giác quan của con người nhằm đánh vào sự ham…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Chuyện tế nhị\": Nguyên tắc của concept này đấy là làm sao để có thể kích hoạt được các giác quan của con người nhằm đánh vào sự ham muốn, khao khát có được, chiếm hữu được.",
+  },
+  {
+    id: "bat-mi-bi-mat",
+    name: "Bật mí bí mật",
     emoji: "🕵️",
-    description: "Tiết lộ góc khuất ít ai biết.",
+    description: "Nguyên tắt của concept bật mí bí mật theo kiểu kết hợp của người nổi tiếng thì căn bản là phải tạo cho người ta cảm…",
     group: "discover",
-    promptFragment:
-      "Triển khai kiểu BÓC TRẦN / SỰ THẬT NGẦM: tiết lộ góc khuất, bí mật ít ai biết đằng sau một ngành nghề/nhân vật, tạo cảm giác 'người trong cuộc'.",
+    promptFragment: "Triển khai theo concept \"Bật mí bí mật\": Nguyên tắt của concept bật mí bí mật theo kiểu kết hợp của người nổi tiếng thì căn bản là phải tạo cho người ta cảm giác tò mò, gay cấn. Miễn làm sao mà khiến họ ít ngờ tới, giúp vỡ lẽ ra một sự thật nào đấy. Chủ đề càng nhiều người quan tâm/càng nổi tiếng thì càng tốt",
   },
   {
-    id: "quiz",
-    name: "Hỏi đáp / Thách thức",
-    emoji: "❓",
-    description: "Câu đố, bài toán kích thích tương tác.",
+    id: "cuoc-thi-gameshow",
+    name: "Cuộc thi / Gameshow",
+    emoji: "🏆",
+    description: "Thông thường các câu thách đố này sẽ liên quan trực tiếp đến insight đối tượng khách hàng mà các bạn đang hướng tới là…",
     group: "discover",
-    promptFragment:
-      "Triển khai kiểu HỎI ĐÁP / THÁCH THỨC TƯ DUY: đặt câu hỏi đố vui, bài toán hoặc tình huống kích thích người xem bình luận trả lời và tương tác.",
+    promptFragment: "Triển khai theo concept \"Cuộc thi / Gameshow\": Thông thường các câu thách đố này sẽ liên quan trực tiếp đến insight đối tượng khách hàng mà các bạn đang hướng tới là chủ yếu. Nhằm mục đích để thỏa mãn \"nhu cầu thể hiện cá nhân\" của mỗi người",
+  },
+  {
+    id: "nguoc-doi-nghich-ly",
+    name: "Ngược đời nghịch lý",
+    emoji: "🙃",
+    description: "Thực hiện ở một góc nhìn \"ngược\" lại hoàn toàn so với mặc định vốn có",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Ngược đời nghịch lý\": Thực hiện ở một góc nhìn \"ngược\" lại hoàn toàn so với mặc định vốn có",
+  },
+  {
+    id: "vung-mien-dan-toc",
+    name: "Vùng miền dân tộc",
+    emoji: "🗺️",
+    description: "Vẫn là tập trung đánh vào yếu tố nhu cầu muốn được xem những cái đẹp của con người. Hầu như những bạn ở dân tộc có nét…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Vùng miền dân tộc\": Vẫn là tập trung đánh vào yếu tố nhu cầu muốn được xem những cái đẹp của con người. Hầu như những bạn ở dân tộc có nét đẹp riêng vốn có, kín đáo thì vẫn dễ khiến cho những người khác giới đều cảm thấy thích",
+  },
+  {
+    id: "duy-nhat",
+    name: "Duy nhất",
+    emoji: "🥇",
+    description: "Đưa ra một đối tượng, chủ thể mà chỉ có người đó mới là người đối xử cực kì tốt/không điều kiện Thông thường nó sẽ liên…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Duy nhất\": Đưa ra một đối tượng, chủ thể mà chỉ có người đó mới là người đối xử cực kì tốt/không điều kiện Thông thường nó sẽ liên quan đến tình cảm gia đình nhiều hơn",
+  },
+  {
+    id: "canh-bao",
+    name: "Cảnh báo",
+    emoji: "⚠️",
+    description: "Tính xác thực: Thông tin phải chính xác, có nguồn gốc rõ ràng, tránh gây hoang mang hoặc đưa tin sai lệch. - Tính cấp…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Cảnh báo\": Tính xác thực: Thông tin phải chính xác, có nguồn gốc rõ ràng, tránh gây hoang mang hoặc đưa tin sai lệch. - Tính cấp thiết: Đề cập đến những vấn đề có ảnh hưởng trực tiếp hoặc tiềm ẩn nguy cơ cao đến người xem. (Gây hại sức khỏe, Mất tài sản, Ảnh hưởng tinh thần/ tâm lý,...) - Tính hữu ích: Cung cấp giải pháp, hướng dẫn hoặc cách phòng tránh cụ thể, thiết thực . - Thông tin cảnh báo hướng đến…",
+  },
+  {
+    id: "diy-tu-lam",
+    name: "DIY – Tự làm",
+    emoji: "🧰",
+    description: "Tập trung vào ''hướng dẫn'' hoặc ''cung cấp giải pháp'' để mọi người tự làm/ cải tiến những sản phẩm, công việc thay vì…",
+    group: "value",
+    promptFragment: "Triển khai theo concept \"DIY – Tự làm\": Tập trung vào ''hướng dẫn'' hoặc ''cung cấp giải pháp'' để mọi người tự làm/ cải tiến những sản phẩm, công việc thay vì mua sẵn hay thuê người khác làm. ( Bánh xà phòng, đồ dùng trong gia đình, Quần áo, đồ trang trí,...) - Sản phẩm tạo ra mang lại giá trị với người dùng, người xem.",
+  },
+  {
+    id: "du-lieu-nghien-cuu",
+    name: "Dữ liệu & nghiên cứu",
+    emoji: "📊",
+    description: "Đem đến những thông tin giá trị dựa trên nghiên cứu & dữ liệu được xác thực. => Có sức thuyết phục cao, tăng cường sự…",
+    group: "value",
+    promptFragment: "Triển khai theo concept \"Dữ liệu & nghiên cứu\": Đem đến những thông tin giá trị dựa trên nghiên cứu & dữ liệu được xác thực. => Có sức thuyết phục cao, tăng cường sự tín nhiệm đến vị trí người xem, độc giả. Tiêu chuẩn chọn nguồn Dữ liệu và Nghiên cứu phù hợp: -Chọn dữ liệu, nghiên cứu đáng tin cậy: - Nguồn uy tín: Có chuyên môn cao+ (được nhà nước cấp phép), thông tin lấy từ ''Đối tượng có uy tín/có tầm ảnh hưởng lớn'' đối với tệp khách hàng…",
+  },
+  {
+    id: "phi-thuong",
+    name: "Phi thường",
+    emoji: "🤩",
+    description: "Concept \"Phi Thường\" tập trung vào những câu chuyện, hành động, hoặc thành tích vượt xa khỏi khả năng thông thường của…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Phi thường\": Concept \"Phi Thường\" tập trung vào những câu chuyện, hành động, hoặc thành tích vượt xa khỏi khả năng thông thường của con người. - Nội dung thuộc concept này thường gợi cảm hứng mạnh mẽ, truyền tải thông điệp về sự nỗ lực, ý chí phi thường và tinh thần hy sinh cao cả.",
+  },
+  {
+    id: "bat-trend",
+    name: "Bắt trend",
+    emoji: "🎵",
+    description: "Mọi nội dung thuộc concept Trend đều có tính chất hữu hạn về thời gian, đa phần sẽ bùng phát và lan truyền mạnh mẽ khi…",
+    group: "trend",
+    promptFragment: "Triển khai theo concept \"Bắt trend\": Mọi nội dung thuộc concept Trend đều có tính chất hữu hạn về thời gian, đa phần sẽ bùng phát và lan truyền mạnh mẽ khi xuất hiện đúng thời điểm. Dù được tạo ra theo cách có chủ đích, dựa vào thời điểm cố định, hay vô tình, cốt lõi là nội dung vẫn phải kích thích sự yêu thích và hưởng ứng từ đám đông",
+  },
+  {
+    id: "phat-kien-moi",
+    name: "Phát kiến mới",
+    emoji: "💡",
+    description: "Phát kiến phải mang yếu tố mới mẻ và độc đáo (khác biệt so với những gì đã tồn tại trước đó) và đồng thời mang lại giá…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Phát kiến mới\": Phát kiến phải mang yếu tố mới mẻ và độc đáo (khác biệt so với những gì đã tồn tại trước đó) và đồng thời mang lại giá trị thực tiễn rõ ràng, có khả năng ứng dụng cao trong đời sống",
+  },
+  {
+    id: "chuyen-la-do-day",
+    name: "Chuyện lạ đó đây",
+    emoji: "🌍",
+    description: "Nội dung cần tập trung vào những sự việc, hiện tượng hoặc câu chuyện kỳ quặc, khác thường đến mức gây bất ngờ hoặc tò…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Chuyện lạ đó đây\": Nội dung cần tập trung vào những sự việc, hiện tượng hoặc câu chuyện kỳ quặc, khác thường đến mức gây bất ngờ hoặc tò mò mạnh mẽ. Điểm nhấn nằm ở tính độc lạ và hiếm gặp, tạo cảm giác \"không thể tin nổi\" nhưng vẫn phải đảm bảo tính xác thực hoặc gợi cảm giác có thể xảy ra",
+  },
+  {
+    id: "deo-bam",
+    name: "Đeo bám",
+    emoji: "📌",
+    description: "Tập trung khai thác và bám đuổi một sự kiện/nhân vật cho đến cùng đến khi nào một trong hai có dấu hiệu \"đuối\" thì mới…",
+    group: "trend",
+    promptFragment: "Triển khai theo concept \"Đeo bám\": Tập trung khai thác và bám đuổi một sự kiện/nhân vật cho đến cùng đến khi nào một trong hai có dấu hiệu \"đuối\" thì mới thôi. Thông thường mục tiêu bám đuổi sẽ có hai kiểu: hoặc là muốn triệt để đối phương một cách tiêu cực hoặc tích cực",
+  },
+  {
+    id: "thuc-giuc",
+    name: "Thúc giục",
+    emoji: "⏰",
+    description: "Concept này nhấn mạnh vào sự cấp bách và hậu quả nghiêm trọng nếu không hành động kịp thời. Nội dung cần tạo cảm giác…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Thúc giục\": Concept này nhấn mạnh vào sự cấp bách và hậu quả nghiêm trọng nếu không hành động kịp thời. Nội dung cần tạo cảm giác nguy cơ rõ ràng hoặc đánh vào nỗi sợ của khán giả, từ đó thúc đẩy họ hành động ngay để tránh rủi ro hoặc mất mát. Tuy nhiên, cần đảm bảo thông điệp trung thực, tránh phóng đại hoặc gây hoang mang không cần thiết",
+  },
+  {
+    id: "ky-quac-ngo-ngan",
+    name: "Kỳ quặc ngớ ngẩn",
+    emoji: "🤪",
+    description: "Nội dung tập trung vào những khám phá, phát minh, hoặc ý tưởng mới lạ nhưng mang tính kỳ quặc, khó tin, hoặc không thực…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Kỳ quặc ngớ ngẩn\": Nội dung tập trung vào những khám phá, phát minh, hoặc ý tưởng mới lạ nhưng mang tính kỳ quặc, khó tin, hoặc không thực tế. Điểm nhấn nằm ở sự ngớ ngẩn, kỳ quặc của các phát kiến và cũng không có khả năng ứng dụng thực tế dài hạn",
+  },
+  {
+    id: "chung-nhan",
+    name: "Chứng nhận",
+    emoji: "✅",
+    description: "Concept \"Chứng nhận\" tập trung vào việc làm nổi bật uy tín, thành tựu, hoặc sự công nhận của cá nhân, tổ chức, hoặc sản…",
+    group: "value",
+    promptFragment: "Triển khai theo concept \"Chứng nhận\": Concept \"Chứng nhận\" tập trung vào việc làm nổi bật uy tín, thành tựu, hoặc sự công nhận của cá nhân, tổ chức, hoặc sản phẩm thông qua các giải thưởng, danh hiệu, hoặc kết quả đã được xác minh. Nội dung nhấn mạnh vào tính đáng tin cậy, nổi bật, và xứng đáng, giúp khán giả cảm thấy tin tưởng và ấn tượng với điều được chứng nhận",
+  },
+  {
+    id: "ufo-bi-an",
+    name: "UFO – Bí ẩn",
+    emoji: "🛸",
+    description: "Concept \"UFO\" tập trung vào các nội dung bí ẩn, không xác định, và kích thích trí tò mò, thường xoay quanh những câu…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"UFO – Bí ẩn\": Concept \"UFO\" tập trung vào các nội dung bí ẩn, không xác định, và kích thích trí tò mò, thường xoay quanh những câu chuyện hoặc hiện tượng kỳ lạ, không thể giải thích hoặc chưa được chứng minh. Mục tiêu là tạo cảm giác huyền bí, gợi sự tò mò và tranh luận, đồng thời khuyến khích khán giả tưởng tượng hoặc đưa ra phán đoán riêng",
+  },
+  {
+    id: "hay-cuon",
+    name: "Hay & cuốn",
+    emoji: "👌",
+    description: "Nội dung phải mang lại sự bất ngờ, hấp dẫn và kích thích sự tham gia của khán giả, khiến họ cảm thấy hứng thú, vỗ đùi…",
+    group: "value",
+    promptFragment: "Triển khai theo concept \"Hay & cuốn\": Nội dung phải mang lại sự bất ngờ, hấp dẫn và kích thích sự tham gia của khán giả, khiến họ cảm thấy hứng thú, vỗ đùi và thốt lên khen \"Hay\". Yếu tố \"hay\" được thể hiện qua sự lôi cuốn trong cách tổ chức, độ thú vị của thử thách, và cảm giác thỏa mãn khi người tham gia hoặc người xem trải nghiệm nội dung",
+  },
+  {
+    id: "tot-dep-bat-ngo",
+    name: "Tốt đẹp bất ngờ",
+    emoji: "🎁",
+    description: "Đó là nội dung tập trung vào quá trình phát triển hoặc biến đổi bất ngờ trong một hành trình, từ những khó khăn, định…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Tốt đẹp bất ngờ\": Đó là nội dung tập trung vào quá trình phát triển hoặc biến đổi bất ngờ trong một hành trình, từ những khó khăn, định kiến, hoặc khởi đầu tiêu cực đến một kết quả tích cực, đầy cảm hứng. Yếu tố \"hành trình\" giúp làm nổi bật sự cố gắng, nỗ lực, và sự \"tốt đẹp một cách bất ngờ\" chính là làm khán giả ngạc nhiên/cảm động với kết quả cuối cùng.",
+  },
+  {
+    id: "van-de-giai-phap-tuong-tuong",
+    name: "Vấn đề & giải pháp tưởng tượng",
+    emoji: "🧩",
+    description: "Tập trung vào việc tạo ra các tình huống hoặc kịch bản chưa xảy ra nhưng có thể xảy ra dựa trên xu hướng, vấn đề hiện…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Vấn đề & giải pháp tưởng tượng\": Tập trung vào việc tạo ra các tình huống hoặc kịch bản chưa xảy ra nhưng có thể xảy ra dựa trên xu hướng, vấn đề hiện tại, hoặc trí tưởng tượng sáng tạo. Nội dung mang tính logic, kích thích trí tò mò của khán giả, đồng thời mở ra góc nhìn thú vị hoặc giải pháp mới cho các vấn đề trong tương lai",
+  },
+  {
+    id: "nhan-qua-lien-ket",
+    name: "Nhân quả liên kết",
+    emoji: "🔗",
+    description: "Concept này tập trung vào việc làm rõ mối liên hệ logic giữa nguyên nhân và kết quả để truyền tải ý nghĩa hoặc thông…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Nhân quả liên kết\": Concept này tập trung vào việc làm rõ mối liên hệ logic giữa nguyên nhân và kết quả để truyền tải ý nghĩa hoặc thông điệp sâu sắc. Nội dung phải có sự liên kết chặt chẽ, gây tò mò ở phần nguyên nhân và mang lại kết quả bất ngờ hoặc ấn tượng, từ đó thu hút sự chú ý và tạo sự đồng cảm hoặc hứng thú cho khán giả",
+  },
+  {
+    id: "ma-kinh-di",
+    name: "Ma – Kinh dị",
+    emoji: "👻",
+    description: "Khi kết hợp giữa ma (hoặc yếu tố tâm linh) và giải pháp trong tưởng tượng, nội dung thường xoay quanh việc đưa ra các…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Ma – Kinh dị\": Khi kết hợp giữa ma (hoặc yếu tố tâm linh) và giải pháp trong tưởng tượng, nội dung thường xoay quanh việc đưa ra các giải pháp giả định, phi thực tế nhưng sáng tạo",
+  },
+  {
+    id: "giai-thuong",
+    name: "Giải thưởng",
+    emoji: "🎖️",
+    description: "Tập trung vào việc làm nổi bật những thành tựu, giải thưởng, hoặc danh hiệu mà nhân vật/câu chuyện đạt được. - Những…",
+    group: "discover",
+    promptFragment: "Triển khai theo concept \"Giải thưởng\": Tập trung vào việc làm nổi bật những thành tựu, giải thưởng, hoặc danh hiệu mà nhân vật/câu chuyện đạt được. - Những thành tựu, giải thưởng,..: Thường không dễ dàng có được. - Điểm nhấn chính: sự ngưỡng mộ, tự hào, và giá trị mà giải thưởng mang lại, - Đặc biệt: truyền cảm hứng cho người xem bằng cách làm nổi bật sự nỗ lực, hành trình và ý nghĩa của thành tựu đó.",
+  },
+  {
+    id: "hai-huoc",
+    name: "Hài hước",
+    emoji: "😂",
+    description: "Tập trung vào việc làm cho khán giả cười, cảm thấy thoải mái, hoặc gợi lên sự thích thú thông qua các yếu tố vui nhộn…",
+    group: "emotion",
+    promptFragment: "Triển khai theo concept \"Hài hước\": Tập trung vào việc làm cho khán giả cười, cảm thấy thoải mái, hoặc gợi lên sự thích thú thông qua các yếu tố vui nhộn, bất ngờ. - Nội dung hài hước thường dễ lan tỏa nhờ khả năng kích thích cảm xúc tích cực, giúp khán giả kết nối dễ dàng hơn.",
   },
 ];
 
 export const getConcept = (id: string): Concept | undefined =>
   CONCEPTS.find((c) => c.id === id);
 
-/** Concepts nhóm theo CONCEPT_GROUPS, giữ đúng thứ tự nhóm. */
 export const conceptsByGroup = () =>
   CONCEPT_GROUPS.map((g) => ({
     ...g,

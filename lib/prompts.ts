@@ -101,7 +101,7 @@ export function buildMaterialPrompt(req: MaterialRequest): string {
 /**
  * "Kịch bản video" — from a customer portrait: analyse 5 pains + 3 hidden
  * desires, then produce 3 best HILLA scripts. The HILLA formula and all script
- * constraints are fixed here; only the portrait + industry voice come in.
+ * constraints are fixed here; only the portrait + script summary come in.
  */
 export function buildScriptSystemPrompt(): string {
   return [
@@ -112,32 +112,54 @@ export function buildScriptSystemPrompt(): string {
   ].join("\n\n");
 }
 
-export function buildScriptPrompt(req: VideoScriptRequest): string {
+/** Header shared by both steps: target portrait + desired direction. */
+function scriptContext(req: VideoScriptRequest): string[] {
   return [
     "CHÂN DUNG KHÁCH HÀNG MỤC TIÊU:",
     req.customerPortrait.trim(),
     "",
-    `GIỌNG NGƯỜI LÀM KÊNH (viết như người trong ngành này): ${req.industry.trim() || "người có kinh nghiệm thực tế trong lĩnh vực liên quan"}.`,
+    `TÓM TẮT / ĐỊNH HƯỚNG KỊCH BẢN NGƯỜI DÙNG MUỐN TẠO: ${req.summary?.trim() || "(không nêu cụ thể — hãy tự chọn góc khai thác mạnh nhất phù hợp với chân dung khách hàng)"}.`,
     "",
-    "Hãy thực hiện đầy đủ 3 PHẦN sau:",
+  ];
+}
+
+/** BƯỚC 1 — chỉ phân tích nỗi đau + mong muốn (ngắn gọn). */
+export function buildAnalysisPrompt(req: VideoScriptRequest): string {
+  return [
+    ...scriptContext(req),
+    "Hãy phân tích 2 PHẦN sau, viết SÚC TÍCH:",
     "",
-    "## PHẦN 1 — 5 nỗi đau lớn nhất",
-    "Liệt kê 5 nỗi đau lớn nhất của khách hàng. Với MỖI nỗi đau, phân tích rõ 5 lớp:",
+    "## PHẦN 1 — 3–5 nỗi đau lớn nhất",
+    "Liệt kê 3–5 nỗi đau lớn nhất của khách hàng. Với MỖI nỗi đau, viết NGẮN GỌN mỗi lớp 1 câu:",
     "- **Tình huống thực tế**",
     "- **Cảm xúc bên trong**",
     "- **Suy nghĩ thầm kín**",
     "- **Điều họ từng thử nhưng thất bại**",
     "- **Điều khiến họ áp lực nhất**",
     "",
-    "## PHẦN 2 — 3 mong muốn thầm kín",
-    "Nêu 3 mong muốn thầm kín nhất mà khách hàng khao khát nhưng thường không dám nói ra. Với MỖI mong muốn, trình bày:",
+    "## PHẦN 2 — 3–5 mong muốn thầm kín",
+    "Nêu 3–5 mong muốn thầm kín nhất mà khách hàng khao khát nhưng thường không dám nói ra. Với MỖI mong muốn, viết NGẮN GỌN:",
     "- **Mong muốn thầm kín** (viết như khách hàng tự nói trong đầu)",
     "- **Cảm xúc phía sau** (họ thật sự đang thiếu điều gì?)",
     "- **Góc content có thể khai thác** (tự ti / muốn được công nhận / muốn thay đổi…)",
     "- **Hook/video mở đầu** (viết kiểu viral TikTok/Facebook)",
     "",
-    "## PHẦN 3 — 3 kịch bản video HILLA chất lượng nhất",
-    "Chọn 3 insight MẠNH NHẤT từ Phần 1 & 2, viết thành 3 kịch bản video hoàn chỉnh theo công thức HILLA:",
+    "CHỈ trả về Phần 1 & Phần 2, KHÔNG viết kịch bản ở bước này.",
+  ].join("\n");
+}
+
+/** BƯỚC 2 — viết 3 kịch bản HILLA, dựa trên phần phân tích đã có. */
+export function buildScriptsPrompt(req: VideoScriptRequest): string {
+  return [
+    ...scriptContext(req),
+    req.analysis?.trim()
+      ? "PHÂN TÍCH NỖI ĐAU & MONG MUỐN (đã có từ bước trước — hãy dựa vào đây):\n" +
+        req.analysis.trim()
+      : "",
+    "",
+    "## 3 kịch bản video HILLA chất lượng nhất",
+    "BẮT BUỘC viết ĐỦ CHÍNH XÁC 3 kịch bản hoàn chỉnh, đánh số rõ bằng heading: `### Kịch bản 1`, `### Kịch bản 2`, `### Kịch bản 3`. TUYỆT ĐỐI không dừng lại khi chưa viết xong cả 3.",
+    "Chọn 3 insight MẠNH NHẤT từ phần phân tích, viết theo công thức HILLA:",
     "- **H = Hook** — dưới 3 giây, chạm thẳng nỗi đau hoặc mong muốn, có yếu tố tò mò.",
     "- **I = Interest** — nuôi sự tò mò, khiến người xem muốn nghe tiếp.",
     "- **L = Logic** — mạch lý lẽ/giải thích hợp lý.",
@@ -151,5 +173,7 @@ export function buildScriptPrompt(req: VideoScriptRequest): string {
     "- CHIA TỪNG CÂU XUỐNG DÒNG (mỗi câu một dòng riêng) để đọc trước camera cho dễ.",
     "- Ghi rõ nhãn từng khối: H (Hook) / I / L / L / A.",
     "- Mỗi kịch bản có tiêu đề ngắn nêu insight nó khai thác.",
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
