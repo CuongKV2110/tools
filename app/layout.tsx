@@ -15,8 +15,8 @@ const fontMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Content Support — Tạo & quản lý nội dung AI",
-  description: "Tạo nội dung AI theo phong cách bạn chọn và quản lý ở một nơi.",
+  title: "Giúp bạn tạo content viral",
+  description: "Tạo nội dung theo phong cách của bạn",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
