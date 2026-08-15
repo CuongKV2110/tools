@@ -4,13 +4,24 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Mail, Lock } from "lucide-react";
+import { Loader2, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { authErrorMessage } from "@/lib/firebase-errors";
+import { validateEmail, validateLoginPassword } from "@/lib/validation";
 import { GoogleButton } from "@/components/auth/google-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+
+function FieldError({ message }: { message: string }) {
+  return (
+    <p className="flex items-center gap-1 text-xs font-medium text-destructive">
+      <AlertCircle className="size-3.5" />
+      {message}
+    </p>
+  );
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,6 +31,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [touched, setTouched] = useState({ email: false, password: false });
+
+  const emailError = validateEmail(email);
+  const pwError = validateLoginPassword(password);
+  const formValid = !emailError && !pwError;
 
   useEffect(() => {
     if (!loading && user) router.replace("/dashboard");
@@ -27,6 +44,8 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setTouched({ email: true, password: true });
+    if (!formValid) return;
     setBusy(true);
     try {
       await signInEmail(email, password);
@@ -81,7 +100,7 @@ export default function LoginPage() {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <div className="relative">
@@ -93,31 +112,55 @@ export default function LoginPage() {
               placeholder="ban@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-12 pl-10 text-base"
+              onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+              aria-invalid={touched.email && !!emailError}
+              className={cn(
+                "h-12 pl-10 text-base",
+                touched.email &&
+                  emailError &&
+                  "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/30"
+              )}
             />
           </div>
+          {touched.email && emailError && <FieldError message={emailError} />}
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="password">Mật khẩu</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               id="password"
-              type="password"
+              type={showPw ? "text" : "password"}
               autoComplete="current-password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
-              className="h-12 pl-10 text-base"
+              onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+              aria-invalid={touched.password && !!pwError}
+              className={cn(
+                "h-12 pl-10 pr-10 text-base",
+                touched.password &&
+                  pwError &&
+                  "border-destructive focus-visible:border-destructive focus-visible:ring-destructive/30"
+              )}
             />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+              aria-label={showPw ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+            >
+              {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
           </div>
+          {touched.password && pwError && <FieldError message={pwError} />}
         </div>
+
         <Button
           type="submit"
-          disabled={busy}
-          className="h-12 w-full bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 bg-[length:200%_auto] text-base font-semibold shadow-soft-lg transition-all hover:bg-right hover:shadow-lg active:scale-[0.99]"
+          disabled={busy || !formValid}
+          className="h-12 w-full bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600 bg-[length:200%_auto] text-base font-semibold shadow-soft-lg transition-all hover:bg-right hover:shadow-lg active:scale-[0.99] disabled:opacity-60"
         >
           {busy && <Loader2 className="size-4 animate-spin" />}
           Đăng nhập

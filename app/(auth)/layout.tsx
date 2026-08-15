@@ -78,14 +78,20 @@ export default function AuthLayout({
             </p>
           </div>
 
+          {/* Playful hook */}
+          <div className="max-w-md rounded-2xl border-l-4 border-cyan-300 bg-white/10 px-4 py-3 text-[0.95rem] font-medium italic text-white ring-1 ring-white/10 backdrop-blur">
+            “Chắc là Flop lắm mới tìm đến tôi? 🥺 Hãy cùng nhau tạo ra content
+            viral nào&nbsp;!!!”
+          </div>
+
           {/* Feature highlights */}
           <ul className="flex flex-wrap gap-2.5">
             {HIGHLIGHTS.map(({ icon: Icon, text }) => (
               <li
                 key={text}
-                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium text-white ring-1 ring-white/15 backdrop-blur"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-indigo-700 shadow-md ring-1 ring-black/5 transition-transform hover:-translate-y-0.5"
               >
-                <Icon className="size-4 text-cyan-200" />
+                <Icon className="size-4 text-violet-500" />
                 {text}
               </li>
             ))}
@@ -93,16 +99,25 @@ export default function AuthLayout({
         </FadeIn>
 
         {/* Footer note */}
-        <FadeIn className="text-xs text-white/60">
-          © {" "}Content Support — Trợ lý nội dung AI của bạn.
+        <FadeIn className="flex items-center gap-2 text-xs text-white/60">
+          <span className="inline-flex size-1.5 rounded-full bg-cyan-300" />
+          Content Support — Giúp bạn tạo content viral.
         </FadeIn>
       </div>
 
       {/* Form side */}
-      <div className="relative flex items-center justify-center bg-background p-6 sm:p-10">
-        {/* faint brand accent on mobile / top */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-accent/60 to-transparent lg:hidden" />
-        <FadeIn className="w-full max-w-md">{children}</FadeIn>
+      <div className="relative flex items-center justify-center overflow-hidden bg-gradient-to-b from-accent/40 via-background to-background p-6 sm:p-10">
+        {/* soft decorative glows */}
+        <div className="animate-glow pointer-events-none absolute -right-16 top-1/4 -z-0 size-64 rounded-full bg-primary/5 blur-3xl" />
+        <div className="animate-glow pointer-events-none absolute -left-20 bottom-0 -z-0 size-72 rounded-full bg-violet-400/5 blur-3xl [animation-delay:3s]" />
+
+        <FadeIn className="relative z-10 w-full max-w-md">
+          <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card/90 p-7 shadow-soft-lg backdrop-blur-xl sm:p-9">
+            {/* gradient accent bar on top edge */}
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-cyan-400" />
+            {children}
+          </div>
+        </FadeIn>
       </div>
     </div>
   );
