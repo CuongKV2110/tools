@@ -6,7 +6,9 @@ import { verifyRequest } from "@/lib/auth-helpers";
 import type { AdamScriptRequest } from "@/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// Vercel Pro dùng được tới 300s; gói Hobby tự giới hạn ở 60s. Đặt cao để tránh
+// bị cắt giữa chừng khi tạo 5 kịch bản + caption + hashtag.
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   const user = await verifyRequest(req);
@@ -33,7 +35,7 @@ export async function POST(req: NextRequest) {
     system: buildAdamSystemPrompt(),
     prompt: buildAdamPrompt(body),
     temperature: 0.85,
-    maxOutputTokens: 16384,
+    maxOutputTokens: 8192,
   });
 
   return result.toTextStreamResponse();
