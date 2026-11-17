@@ -91,6 +91,16 @@ export interface VideoScriptRequest {
   analysis?: string;
 }
 
+/** Payload sent to POST /api/adam ("Kịch bản Adam"). */
+export interface AdamScriptRequest {
+  /** Câu hook người dùng đang phân vân, muốn AI tham khảo & làm tốt hơn. */
+  desiredHook: string;
+  /** Mô tả sơ bộ nội dung: diễn biến câu chuyện, hướng kịch bản, cái kết… */
+  summary: string;
+  /** Các từ khóa cảm xúc muốn chèn vào kịch bản (vd: U là chời, Haizz, Woaa…). */
+  emotionWords: string;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Static config (personas / concepts)                                */
 /* ------------------------------------------------------------------ */

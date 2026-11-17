@@ -6,6 +6,7 @@ import type {
   GenerateRequest,
   MaterialRequest,
   VideoScriptRequest,
+  AdamScriptRequest,
 } from "@/types";
 
 /** Build the system prompt for the AI Content Generator. */
@@ -173,6 +174,101 @@ export function buildScriptsPrompt(req: VideoScriptRequest): string {
     "- CHIA TỪNG CÂU XUỐNG DÒNG (mỗi câu một dòng riêng) để đọc trước camera cho dễ.",
     "- Ghi rõ nhãn từng khối: H (Hook) / I / L / L / A.",
     "- Mỗi kịch bản có tiêu đề ngắn nêu insight nó khai thác.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+/**
+ * "Kịch bản Adam" — từ 1 câu hook người dùng đang phân vân + mô tả nội dung +
+ * các từ cảm xúc → đề xuất 5 hook ngắn (3 giây đầu) và 5 kịch bản video khác
+ * nhau, canh voice cho video dài 35–50 giây. Mọi ràng buộc cố định nằm ở đây.
+ */
+/**
+ * Mẫu kịch bản chuẩn phong cách "Adam" (do người dùng cung cấp) — dùng làm
+ * THAM CHIẾU VỀ GIỌNG & MẠCH CẢM XÚC, tuyệt đối không chép lại nội dung.
+ */
+const ADAM_STYLE_EXAMPLE = `Bầu có ăn được mì cay không mọi người? Hôm nay vợ em lên cơn thèm cái gì cay cay, mà cụ thể là mì cay mới chết chứ.
+Ôi mẹ ơi, đây là cái món đứng đầu danh sách đen mà em cấm vợ ăn mấy tháng nay rồi. Nhưng vợ bảo thèm quá không chịu nổi, vật vã lắm rồi...
+Nói thật với các bác, lòng em lúc này còn cay và lo hơn cả cái bát mì cay cấp độ 1 của vợ nữa. U là trời!
+Mà tức cái là vợ em lại cực kỳ thích húp nước! Trong khi cái nước mì đấy toàn muối với gia vị mặn. Haizz!
+Em mới nhắc nhẹ một câu thì vợ em quay sang bảo: "Anh về lên mạng mà hỏi mấy chị em bầu xem người ta có ăn không mà anh cấm em. Gia trưởng nó vừa vừa thôi!"
+Đấy, mọi người nghe xem có tức không! Thật ra em cũng chỉ sợ ảnh hưởng đến bụng dạ của vợ với em bé thôi.
+Các mẹ bầu khác thì sao? Có ai nghén mì cay giống vợ em không?`;
+
+/**
+ * Hashtag cố định của kênh (tầng thương hiệu + ngách + cộng đồng). AI sẽ thêm
+ * 1–3 hashtag chủ đề bám theo từng video. Đổi ở đây nếu kênh đổi tên/ngách.
+ */
+const ADAM_BRAND_HASHTAGS = "#cuongtaplamchong #chongchamvobau #mebau";
+
+export function buildAdamSystemPrompt(): string {
+  return [
+    "Bạn là chuyên gia viết hook và kịch bản video ngắn (TikTok/Reels/Shorts) theo phong cách 'Adam', chuyên về chủ đề MẸ BẦU – MẸ BỈM – MANG THAI – THAI KỲ.",
+    "Văn phong: KỂ CHUYỆN ngôi thứ nhất như đang nhìn thẳng camera tâm sự với 'mọi người/các mẹ/các bác'. Câu ngắn, từ đời thường, cảm xúc thật, nhiều thán từ — TUYỆT ĐỐI không văn mẫu, không hàn lâm, không liệt kê khô khan.",
+    "Mọi kịch bản phải xoay quanh đời sống thai kỳ/mẹ bỉm (ăn uống, nghén, kiêng cữ, sức khỏe mẹ & bé, tâm lý vợ chồng khi mang thai…) và CHÍNH XÁC về mặt kiến thức — khi nhắc thông tin sức khỏe thì nhẹ nhàng, không phán như bác sĩ, luôn khuyến khích hỏi ý kiến chuyên gia khi cần.",
+    "DƯỚI ĐÂY là 1 mẫu kịch bản chuẩn phong cách cần bắt chước về GIỌNG & MẠCH CẢM XÚC (KHÔNG chép nội dung, chỉ học cách kể):",
+    ADAM_STYLE_EXAMPLE,
+    "Trả về Markdown đẹp (heading ##, ###; **in đậm**). Viết bằng tiếng Việt.",
+  ].join("\n\n");
+}
+
+export function buildAdamPrompt(req: AdamScriptRequest): string {
+  const emotions = req.emotionWords?.trim();
+  return [
+    req.desiredHook?.trim()
+      ? [
+          "CÂU HOOK MONG MUỐN CỦA NGƯỜI DÙNG (đây là CHỦ ĐỀ / GÓC HOOK GỐC — CỰC KỲ QUAN TRỌNG):",
+          req.desiredHook.trim(),
+          "→ Cả 5 câu hook BẮT BUỘC phải CÙNG CHỦ ĐỀ, CÙNG GÓC KHAI THÁC với câu trên; chỉ viết lại cho sắc hơn, hấp dẫn hơn. TUYỆT ĐỐI không đi lạc sang chủ đề mẹ bầu khác. Nếu câu gốc là một ý tổng quát (vd 'Tổng kết tam cá nguyệt thứ 1') thì mọi hook phải xoay quanh đúng ý đó (nhìn lại/tổng kết/điều cần nhớ của giai đoạn đó).",
+        ].join("\n")
+      : "CÂU HOOK MONG MUỐN: (người dùng chưa nhập — hãy tự nghĩ hook mạnh nhất bám theo phần mô tả nội dung bên dưới).",
+    "",
+    "MÔ TẢ SƠ BỘ NỘI DUNG (diễn biến, hướng kịch bản, cái kết mong muốn):",
+    req.summary?.trim() || "(không nêu cụ thể — tự chọn góc khai thác mạnh nhất hợp lý)",
+    "",
+    emotions
+      ? `CÁC TỪ KHÓA CẢM XÚC BẮT BUỘC CHÈN TỰ NHIÊN VÀO KỊCH BẢN: ${emotions}. Rải đều, đúng lúc, đúng cảm xúc — không gượng ép, không nhồi nhét.`
+      : "Người dùng không nhập từ cảm xúc riêng — hãy tự thêm các thán từ cảm xúc đời thường (vd: U là trời, Haizz, Woaa, Ây za…) ở những khoảnh khắc hợp lý.",
+    "",
+    "CHỦ ĐỀ KÊNH (bắt buộc bám sát): mẹ bầu, mẹ bỉm, mang thai, các vấn đề trong thai kỳ. Mọi hook và kịch bản phải nằm trong thế giới này.",
+    "",
+    "Hãy trả về ĐÚNG 2 PHẦN theo thứ tự, dùng heading Markdown:",
+    "",
+    "## 5 câu hook đề xuất",
+    "Viết ĐÚNG 5 câu hook, để nói trong 3 GIÂY ĐẦU của video.",
+    "- ƯU TIÊN SỐ 1: nếu người dùng có nhập 'Câu hook mong muốn' ở trên, cả 5 hook phải BÁM CHẶT đúng chủ đề/góc đó (chỉ là 5 cách diễn đạt khác nhau cho cùng ý). Chỉ khi KHÔNG có câu hook mong muốn mới tự chọn góc từ phần mô tả nội dung.",
+    "- Mỗi hook CỰC NGẮN: khoảng 8–12 từ, đọc hết dưới 3 giây.",
+    "- QUAN TRỌNG: mỗi hook phải NÊU NGAY 1 VẤN ĐỀ / CÂU HỎI mà rất nhiều mẹ bầu quan tâm (kiểu 'Bầu có ăn được … không mọi người?', 'Bầu mấy tháng thì…?', 'Nghén … có sao không?') để ai đang mang thai lướt tới là phải dừng lại.",
+    "- BẮT BUỘC: mỗi hook phải CHỨA ít nhất 1 trong các TỪ KHÓA TẠO ĐIỂM NHẤN sau (ưu tiên đặt ở đầu câu, dùng xen kẽ cho đa dạng): \"Đừng\", \"Trước khi\", \"Nếu\", \"Vẫn\", \"Hóa ra\".",
+    "- 5 hook phải KHÁC KIỂU nhau (câu hỏi lo lắng, tình huống dở khóc dở cười, cảnh báo sai lầm…). Đánh số 1–5, mỗi hook một dòng, KHÔNG giải thích.",
+    "",
+    "PHẦN 2 — 5 KỊCH BẢN VIDEO. KHÔNG viết heading tổng bao ngoài; đi thẳng vào từng kịch bản.",
+    "Viết ĐỦ CHÍNH XÁC 5 kịch bản KHÁC NHAU, mỗi kịch bản là 1 heading cấp 2 RIÊNG: `## Kịch bản 1 — <góc khai thác>`, `## Kịch bản 2 — <góc khai thác>`, … đến `## Kịch bản 5 — <góc khai thác>`. KHÔNG dùng heading cấp 3; KHÔNG dừng khi chưa viết xong cả 5.",
+    "QUAN TRỌNG NHẤT — mỗi kịch bản phải NHẤN MẠNH RÕ RỆT vào ĐÚNG 1 ĐÒN TÂM LÝ chủ đạo, phân bổ như sau (ghi luôn đòn này vào sau dấu '—' ở heading):",
+    "- Kịch bản 1 → **NỖI ĐAU**: khoét thật sâu nỗi đau/nỗi sợ/sự bất lực của người xem, gọi tên đúng cảm giác họ đang chịu đựng để họ thấy 'đúng là mình'. Đây là kịch bản QUAN TRỌNG NHẤT, làm mạnh tay nhất — vì video chạm nỗi đau dễ viral, share & lưu cao.",
+    "- Kịch bản 2 → **SỰ ĐỒNG CẢM**: 'mình hiểu mà', kể như người từng trải, vỗ về, khiến người xem thấy được thấu hiểu và không cô đơn.",
+    "- Kịch bản 3 → **SỰ TÒ MÒ**: tạo khoảng trống thông tin, hé lộ nửa chừng, giữ bí mật buộc phải xem tới cuối mới có đáp án.",
+    "- Kịch bản 4 → **SỰ KHÓ HIỂU CẦN GIẢI THÍCH**: nêu một điều gây hoang mang/hiểu lầm/trái ngược thường thấy, rồi giải thích cho vỡ lẽ ('à, hóa ra là vậy').",
+    "- Kịch bản 5 → **SỰ MONG ƯỚC**: khơi khao khát, vẽ ra viễn cảnh/kết quả tốt đẹp mà người xem thầm mong, truyền hy vọng và động lực.",
+    "Dù mang đòn chủ đạo riêng, MỌI kịch bản vẫn nên chạm nhẹ vào nỗi đau ở phần mở/diễn biến rồi mới đẩy sang đòn chính của nó.",
+    "Mỗi kịch bản bám theo nội dung mô tả ở trên, KẾT HỢP các từ cảm xúc đã nêu, và BẮT BUỘC đi theo đúng MẠCH 4 BƯỚC sau (giống mẫu phong cách):",
+    "1. **Câu mở đầu (Hook)**: nêu thẳng 1 vấn đề/câu hỏi nhiều mẹ bầu quan tâm — có thể chọn/biến tấu từ 5 hook ở trên. BẮT BUỘC chứa ít nhất 1 trong các từ tạo điểm nhấn: \"Đừng\", \"Trước khi\", \"Nếu\", \"Vẫn\", \"Hóa ra\".",
+    "2. **Diễn biến**: kể 1 tình huống đời thường, cụ thể, có nhân vật (vợ/chồng/mẹ bỉm) khiến người xem thấy chính mình trong đó; cảm xúc tăng dần.",
+    "3. **Giải pháp + Twist**: đưa ra thông tin/giải pháp đúng đắn một cách tự nhiên, kèm 1 TWIST bất ngờ (một câu phản pháo, một sự thật ít ai ngờ, một cú lật góc nhìn) để tạo bất ngờ và tranh luận.",
+    "4. **Kết**: chốt lại cảm xúc/thông điệp ấm áp, rồi kết bằng 1 CÂU HỎI TƯƠNG TÁC mời các mẹ khác bình luận (kéo comment & share).",
+    "",
+    "Yêu cầu BẮT BUỘC thêm cho mỗi kịch bản:",
+    "- Viết ở ngôi thứ nhất, kể chuyện tâm sự với 'mọi người / các mẹ / các bác', đúng giọng mẫu phong cách.",
+    "- THỜI LƯỢNG VOICE 35–50 GIÂY khi đọc thành tiếng ở tốc độ tự nhiên → viết khoảng 90–140 từ cho mỗi kịch bản. Bám sát khoảng từ này để không quá ngắn/quá dài.",
+    "- Giọng đời thường, Face-to-Face, dễ quay bằng điện thoại, không cần cảnh phụ.",
+    "- CHIA TỪNG CÂU XUỐNG DÒNG (mỗi câu một dòng riêng) để đọc trước camera cho dễ.",
+    "- Rải các từ cảm xúc đúng lúc để tăng cảm xúc; cài câu giữ chân ở đoạn diễn biến/twist.",
+    "- Thông tin sức khỏe thai kỳ phải CHÍNH XÁC và nhẹ nhàng, không phán chắc như bác sĩ.",
+    "- Heading mỗi kịch bản đã nêu góc khai thác; sau nội dung kịch bản ghi 1 dòng: **⏱ Ước lượng voice: ~XX giây** (nằm trong 35–50s).",
+    "- SAU dòng voice, THÊM ĐỦ 2 DÒNG sau cho MỖI kịch bản (để đăng TikTok & Facebook Reels):",
+    "  • **📝 Caption:** viết 1–2 câu. CÂU ĐẦU là hook kịch tính / mở một 'vòng lặp' — hé lộ tình huống nhưng GIẤU kết quả để người xem phải xem hết; nhồi từ khóa tự nhiên (ốm nghén, bà bầu 3 tháng đầu, mang thai…); có 1 CTA nhẹ (lưu lại / tag chồng / comment); KẾT bằng 1 câu hỏi mời bình luận; thêm vài emoji hợp cảnh.",
+    `  • **#️⃣ Hashtag:** 4–6 hashtag theo 3 TẦNG, cách nhau bằng dấu cách. LUÔN mở đầu bằng ${ADAM_BRAND_HASHTAGS} (thương hiệu + ngách + cộng đồng), rồi thêm 1–3 hashtag CHỦ ĐỀ bám đúng nội dung video (ví dụ: #omnghen #daudaukhimangthai #thaiky #3thangdau #baubi #nghennon). TUYỆT ĐỐI KHÔNG dùng #xuhuong, #foryou, #fyp hay các mega-tag bão hoà.`,
   ]
     .filter(Boolean)
     .join("\n");
