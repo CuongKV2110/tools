@@ -5,6 +5,7 @@ import {
   Flame,
   Fingerprint,
   Clapperboard,
+  Lightbulb,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -68,6 +69,12 @@ export const NAV_SECTIONS: NavSection[] = [
         icon: Clapperboard,
         match: (p) => p.startsWith("/script"),
       },
+      {
+        label: "Kịch bản Adam",
+        href: "/adam",
+        icon: Lightbulb,
+        match: (p) => p.startsWith("/adam"),
+      },
     ],
   },
   {
@@ -94,6 +101,7 @@ export const PAGE_TITLES: Record<string, string> = {
   "/concepts": "Concept viral",
   "/material": "Chất liệu bản thân",
   "/script": "Kịch bản video",
+  "/adam": "Kịch bản Adam",
   "/settings": "Cài đặt",
 };
 
