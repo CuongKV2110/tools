@@ -181,7 +181,7 @@ export function buildScriptsPrompt(req: VideoScriptRequest): string {
 
 /**
  * "Kịch bản Adam" — từ 1 câu hook người dùng đang phân vân + mô tả nội dung +
- * các từ cảm xúc → đề xuất 5 hook ngắn (3 giây đầu) và 5 kịch bản video khác
+ * các từ cảm xúc → đề xuất 5 hook ngắn (3 giây đầu) và 3 kịch bản video khác
  * nhau, canh voice cho video dài 35–50 giây. Mọi ràng buộc cố định nằm ở đây.
  */
 /**
@@ -213,16 +213,17 @@ export function buildAdamSystemPrompt(): string {
   ].join("\n\n");
 }
 
-export function buildAdamPrompt(req: AdamScriptRequest): string {
+/** Phần đầu dùng chung cho cả 2 bước: hook mong muốn + mô tả + cảm xúc + niche. */
+function adamContext(req: AdamScriptRequest): string[] {
   const emotions = req.emotionWords?.trim();
   return [
     req.desiredHook?.trim()
       ? [
           "CÂU HOOK MONG MUỐN CỦA NGƯỜI DÙNG (đây là CHỦ ĐỀ / GÓC HOOK GỐC — CỰC KỲ QUAN TRỌNG):",
           req.desiredHook.trim(),
-          "→ Cả 5 câu hook BẮT BUỘC phải CÙNG CHỦ ĐỀ, CÙNG GÓC KHAI THÁC với câu trên; chỉ viết lại cho sắc hơn, hấp dẫn hơn. TUYỆT ĐỐI không đi lạc sang chủ đề mẹ bầu khác. Nếu câu gốc là một ý tổng quát (vd 'Tổng kết tam cá nguyệt thứ 1') thì mọi hook phải xoay quanh đúng ý đó (nhìn lại/tổng kết/điều cần nhớ của giai đoạn đó).",
+          "→ Mọi hook & kịch bản BẮT BUỘC phải CÙNG CHỦ ĐỀ, CÙNG GÓC KHAI THÁC với câu trên; chỉ viết lại cho sắc hơn, hấp dẫn hơn. TUYỆT ĐỐI không đi lạc sang chủ đề mẹ bầu khác. Nếu câu gốc là một ý tổng quát (vd 'Tổng kết tam cá nguyệt thứ 1') thì xoay quanh đúng ý đó (nhìn lại/tổng kết/điều cần nhớ của giai đoạn đó).",
         ].join("\n")
-      : "CÂU HOOK MONG MUỐN: (người dùng chưa nhập — hãy tự nghĩ hook mạnh nhất bám theo phần mô tả nội dung bên dưới).",
+      : "CÂU HOOK MONG MUỐN: (người dùng chưa nhập — hãy tự nghĩ góc mạnh nhất bám theo phần mô tả nội dung bên dưới).",
     "",
     "MÔ TẢ SƠ BỘ NỘI DUNG (diễn biến, hướng kịch bản, cái kết mong muốn):",
     req.summary?.trim() || "(không nêu cụ thể — tự chọn góc khai thác mạnh nhất hợp lý)",
@@ -233,24 +234,40 @@ export function buildAdamPrompt(req: AdamScriptRequest): string {
     "",
     "CHỦ ĐỀ KÊNH (bắt buộc bám sát): mẹ bầu, mẹ bỉm, mang thai, các vấn đề trong thai kỳ. Mọi hook và kịch bản phải nằm trong thế giới này.",
     "",
-    "Hãy trả về ĐÚNG 2 PHẦN theo thứ tự, dùng heading Markdown:",
-    "",
+  ];
+}
+
+/** BƯỚC 1 — chỉ tạo 5 câu hook (nhẹ, nhanh). */
+export function buildAdamHooksPrompt(req: AdamScriptRequest): string {
+  return [
+    ...adamContext(req),
     "## 5 câu hook đề xuất",
-    "Viết ĐÚNG 5 câu hook, để nói trong 3 GIÂY ĐẦU của video.",
+    "Viết ĐÚNG 5 câu hook, để nói trong 3 GIÂY ĐẦU của video. CHỈ trả về phần hook này, KHÔNG viết kịch bản.",
     "- ƯU TIÊN SỐ 1: nếu người dùng có nhập 'Câu hook mong muốn' ở trên, cả 5 hook phải BÁM CHẶT đúng chủ đề/góc đó (chỉ là 5 cách diễn đạt khác nhau cho cùng ý). Chỉ khi KHÔNG có câu hook mong muốn mới tự chọn góc từ phần mô tả nội dung.",
     "- Mỗi hook CỰC NGẮN: khoảng 8–12 từ, đọc hết dưới 3 giây.",
     "- QUAN TRỌNG: mỗi hook phải NÊU NGAY 1 VẤN ĐỀ / CÂU HỎI mà rất nhiều mẹ bầu quan tâm (kiểu 'Bầu có ăn được … không mọi người?', 'Bầu mấy tháng thì…?', 'Nghén … có sao không?') để ai đang mang thai lướt tới là phải dừng lại.",
     "- BẮT BUỘC: mỗi hook phải CHỨA ít nhất 1 trong các TỪ KHÓA TẠO ĐIỂM NHẤN sau (ưu tiên đặt ở đầu câu, dùng xen kẽ cho đa dạng): \"Đừng\", \"Trước khi\", \"Nếu\", \"Vẫn\", \"Hóa ra\".",
     "- 5 hook phải KHÁC KIỂU nhau (câu hỏi lo lắng, tình huống dở khóc dở cười, cảnh báo sai lầm…). Đánh số 1–5, mỗi hook một dòng, KHÔNG giải thích.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+/** BƯỚC 2 — viết 3 kịch bản, dựa trên 5 hook đã tạo ở bước 1. */
+export function buildAdamScriptsPrompt(req: AdamScriptRequest): string {
+  return [
+    ...adamContext(req),
+    req.hooks?.trim()
+      ? "5 CÂU HOOK ĐÃ TẠO Ở BƯỚC TRƯỚC (mỗi kịch bản mở đầu bằng 1 trong số này, có thể biến tấu):\n" +
+        req.hooks.trim()
+      : "",
     "",
-    "PHẦN 2 — 5 KỊCH BẢN VIDEO. KHÔNG viết heading tổng bao ngoài; đi thẳng vào từng kịch bản.",
-    "Viết ĐỦ CHÍNH XÁC 5 kịch bản KHÁC NHAU, mỗi kịch bản là 1 heading cấp 2 RIÊNG: `## Kịch bản 1 — <góc khai thác>`, `## Kịch bản 2 — <góc khai thác>`, … đến `## Kịch bản 5 — <góc khai thác>`. KHÔNG dùng heading cấp 3; KHÔNG dừng khi chưa viết xong cả 5.",
+    "Bây giờ CHỈ viết 3 KỊCH BẢN VIDEO (KHÔNG lặp lại danh sách hook, KHÔNG viết heading tổng bao ngoài; đi thẳng vào từng kịch bản).",
+    "Viết ĐỦ CHÍNH XÁC 3 kịch bản KHÁC NHAU, mỗi kịch bản là 1 heading cấp 2 RIÊNG: `## Kịch bản 1 — <góc khai thác>`, `## Kịch bản 2 — <góc khai thác>`, `## Kịch bản 3 — <góc khai thác>`. KHÔNG dùng heading cấp 3; KHÔNG dừng khi chưa viết xong cả 3.",
     "QUAN TRỌNG NHẤT — mỗi kịch bản phải NHẤN MẠNH RÕ RỆT vào ĐÚNG 1 ĐÒN TÂM LÝ chủ đạo, phân bổ như sau (ghi luôn đòn này vào sau dấu '—' ở heading):",
     "- Kịch bản 1 → **NỖI ĐAU**: khoét thật sâu nỗi đau/nỗi sợ/sự bất lực của người xem, gọi tên đúng cảm giác họ đang chịu đựng để họ thấy 'đúng là mình'. Đây là kịch bản QUAN TRỌNG NHẤT, làm mạnh tay nhất — vì video chạm nỗi đau dễ viral, share & lưu cao.",
     "- Kịch bản 2 → **SỰ ĐỒNG CẢM**: 'mình hiểu mà', kể như người từng trải, vỗ về, khiến người xem thấy được thấu hiểu và không cô đơn.",
     "- Kịch bản 3 → **SỰ TÒ MÒ**: tạo khoảng trống thông tin, hé lộ nửa chừng, giữ bí mật buộc phải xem tới cuối mới có đáp án.",
-    "- Kịch bản 4 → **SỰ KHÓ HIỂU CẦN GIẢI THÍCH**: nêu một điều gây hoang mang/hiểu lầm/trái ngược thường thấy, rồi giải thích cho vỡ lẽ ('à, hóa ra là vậy').",
-    "- Kịch bản 5 → **SỰ MONG ƯỚC**: khơi khao khát, vẽ ra viễn cảnh/kết quả tốt đẹp mà người xem thầm mong, truyền hy vọng và động lực.",
     "Dù mang đòn chủ đạo riêng, MỌI kịch bản vẫn nên chạm nhẹ vào nỗi đau ở phần mở/diễn biến rồi mới đẩy sang đòn chính của nó.",
     "Mỗi kịch bản bám theo nội dung mô tả ở trên, KẾT HỢP các từ cảm xúc đã nêu, và BẮT BUỘC đi theo đúng MẠCH 4 BƯỚC sau (giống mẫu phong cách):",
     "1. **Câu mở đầu (Hook)**: nêu thẳng 1 vấn đề/câu hỏi nhiều mẹ bầu quan tâm — có thể chọn/biến tấu từ 5 hook ở trên. BẮT BUỘC chứa ít nhất 1 trong các từ tạo điểm nhấn: \"Đừng\", \"Trước khi\", \"Nếu\", \"Vẫn\", \"Hóa ra\".",

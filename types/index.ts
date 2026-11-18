@@ -99,6 +99,13 @@ export interface AdamScriptRequest {
   summary: string;
   /** Các từ khóa cảm xúc muốn chèn vào kịch bản (vd: U là chời, Haizz, Woaa…). */
   emotionWords: string;
+  /**
+   * Bước cần chạy (tách để mỗi lần gọi ngắn, tránh timeout trên serverless):
+   * "hooks" = tạo 5 câu hook (mặc định), "scripts" = viết 5 kịch bản.
+   */
+  mode?: "hooks" | "scripts";
+  /** 5 hook đã tạo ở bước 1 — truyền vào khi mode = "scripts". */
+  hooks?: string;
 }
 
 /* ------------------------------------------------------------------ */

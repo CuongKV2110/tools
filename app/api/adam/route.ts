@@ -1,12 +1,18 @@
 import type { NextRequest } from "next/server";
 import { streamText } from "ai";
 import { contentModel, isAIConfigured } from "@/lib/ai";
-import { buildAdamSystemPrompt, buildAdamPrompt } from "@/lib/prompts";
+import {
+  buildAdamSystemPrompt,
+  buildAdamHooksPrompt,
+  buildAdamScriptsPrompt,
+} from "@/lib/prompts";
 import { verifyRequest } from "@/lib/auth-helpers";
 import type { AdamScriptRequest } from "@/types";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// Vercel Pro dùng được tới 300s; gói Hobby tự giới hạn ở 60s. Đặt cao để tránh
+// bị cắt giữa chừng khi tạo 5 kịch bản + caption + hashtag.
+export const maxDuration = 300;
 
 export async function POST(req: NextRequest) {
   const user = await verifyRequest(req);
@@ -28,12 +34,15 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  const isScripts = body.mode === "scripts";
   const result = streamText({
     model: contentModel,
     system: buildAdamSystemPrompt(),
-    prompt: buildAdamPrompt(body),
+    prompt: isScripts
+      ? buildAdamScriptsPrompt(body)
+      : buildAdamHooksPrompt(body),
     temperature: 0.85,
-    maxOutputTokens: 16384,
+    maxOutputTokens: 8192,
   });
 
   return result.toTextStreamResponse();

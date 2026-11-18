@@ -103,6 +103,40 @@ export function AdamForm() {
     }
   }
 
+  /**
+   * Stream one step from /api/adam. `onChunk(accSoFar)` fires on each chunk so
+   * the caller can update the combined view live. Returns the full text.
+   */
+  async function streamStep(
+    token: string,
+    payload: Record<string, unknown>,
+    signal: AbortSignal,
+    onChunk: (acc: string) => void
+  ): Promise<string> {
+    const res = await fetch("/api/adam", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+      signal,
+    });
+    if (!res.ok || !res.body) {
+      throw new Error((await res.text().catch(() => "")) || `Lỗi ${res.status}`);
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let acc = "";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      acc += decoder.decode(value, { stream: true });
+      onChunk(acc);
+    }
+    return acc;
+  }
+
   async function handleGenerate() {
     if (!summary.trim() && !desiredHook.trim()) {
       toast.error("Hãy nhập câu hook hoặc mô tả nội dung.");
@@ -121,32 +155,30 @@ export function AdamForm() {
     abortRef.current = controller;
 
     try {
-      const res = await fetch("/api/adam", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ desiredHook, summary, emotionWords }),
-        signal: controller.signal,
-      });
-      if (!res.ok || !res.body) {
-        throw new Error(
-          (await res.text().catch(() => "")) || `Lỗi ${res.status}`
-        );
-      }
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let acc = "";
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        acc += decoder.decode(value, { stream: true });
-        setResult(acc);
-      }
-      if (!acc.trim()) {
+      // Bước 1: tạo 5 hook (nhanh).
+      const hooks = await streamStep(
+        token,
+        { desiredHook, summary, emotionWords, mode: "hooks" },
+        controller.signal,
+        (acc) => setResult(acc)
+      );
+      if (!hooks.trim()) {
         toast.error(
           "Model AI đang quá tải, chưa trả về kết quả. Vui lòng thử lại sau vài giây."
+        );
+        return;
+      }
+
+      // Bước 2: viết 3 kịch bản, bám theo hook vừa tạo.
+      const scripts = await streamStep(
+        token,
+        { desiredHook, summary, emotionWords, mode: "scripts", hooks },
+        controller.signal,
+        (acc) => setResult(`${hooks}\n\n${acc}`)
+      );
+      if (!scripts.trim()) {
+        toast.error(
+          "Đã có 5 hook nhưng chưa tạo được kịch bản. Vui lòng bấm Tạo content lại."
         );
       }
     } catch (err) {
@@ -250,7 +282,7 @@ export function AdamForm() {
             <div className="mb-4 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Lightbulb className="size-4 text-primary" />
-                5 hook đề xuất &amp; 5 kịch bản
+                5 hook đề xuất &amp; 3 kịch bản
                 {streaming && (
                   <Loader2 className="size-3.5 animate-spin text-primary" />
                 )}
@@ -310,7 +342,7 @@ export function AdamForm() {
               Nhập mô tả nội dung (và câu hook đang phân vân nếu có), chọn từ cảm
               xúc rồi bấm{" "}
               <span className="font-medium text-foreground">Tạo content</span>.
-              AI sẽ gợi ý 5 hook ngắn và 5 kịch bản voice 35–50 giây.
+              AI sẽ gợi ý 5 hook ngắn và 3 kịch bản voice 35–50 giây.
             </p>
           </CardContent>
         </Card>
