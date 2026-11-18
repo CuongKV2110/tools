@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { streamText } from "ai";
-import { contentModel, isAIConfigured } from "@/lib/ai";
+import { adamModel, isAdamAIConfigured } from "@/lib/ai";
 import {
   buildAdamSystemPrompt,
   buildAdamHooksPrompt,
@@ -28,15 +28,15 @@ export async function POST(req: NextRequest) {
   if (!body.summary?.trim() && !body.desiredHook?.trim()) {
     return new Response("Thiếu mô tả nội dung hoặc câu hook", { status: 400 });
   }
-  if (!isAIConfigured()) {
-    return new Response("Chưa cấu hình GOOGLE_GENERATIVE_AI_API_KEY.", {
+  if (!isAdamAIConfigured()) {
+    return new Response("Chưa cấu hình ANTHROPIC_API_KEY.", {
       status: 500,
     });
   }
 
   const isScripts = body.mode === "scripts";
   const result = streamText({
-    model: contentModel,
+    model: adamModel,
     system: buildAdamSystemPrompt(),
     prompt: isScripts
       ? buildAdamScriptsPrompt(body)
