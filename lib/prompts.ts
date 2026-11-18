@@ -181,7 +181,7 @@ export function buildScriptsPrompt(req: VideoScriptRequest): string {
 
 /**
  * "Kịch bản Adam" — từ 1 câu hook người dùng đang phân vân + mô tả nội dung +
- * các từ cảm xúc → đề xuất 5 hook ngắn (3 giây đầu) và 5 kịch bản video khác
+ * các từ cảm xúc → đề xuất 5 hook ngắn (3 giây đầu) và 3 kịch bản video khác
  * nhau, canh voice cho video dài 35–50 giây. Mọi ràng buộc cố định nằm ở đây.
  */
 /**
@@ -253,7 +253,7 @@ export function buildAdamHooksPrompt(req: AdamScriptRequest): string {
     .join("\n");
 }
 
-/** BƯỚC 2 — viết 5 kịch bản, dựa trên 5 hook đã tạo ở bước 1. */
+/** BƯỚC 2 — viết 3 kịch bản, dựa trên 5 hook đã tạo ở bước 1. */
 export function buildAdamScriptsPrompt(req: AdamScriptRequest): string {
   return [
     ...adamContext(req),
@@ -262,14 +262,12 @@ export function buildAdamScriptsPrompt(req: AdamScriptRequest): string {
         req.hooks.trim()
       : "",
     "",
-    "Bây giờ CHỈ viết 5 KỊCH BẢN VIDEO (KHÔNG lặp lại danh sách hook, KHÔNG viết heading tổng bao ngoài; đi thẳng vào từng kịch bản).",
-    "Viết ĐỦ CHÍNH XÁC 5 kịch bản KHÁC NHAU, mỗi kịch bản là 1 heading cấp 2 RIÊNG: `## Kịch bản 1 — <góc khai thác>`, `## Kịch bản 2 — <góc khai thác>`, … đến `## Kịch bản 5 — <góc khai thác>`. KHÔNG dùng heading cấp 3; KHÔNG dừng khi chưa viết xong cả 5.",
+    "Bây giờ CHỈ viết 3 KỊCH BẢN VIDEO (KHÔNG lặp lại danh sách hook, KHÔNG viết heading tổng bao ngoài; đi thẳng vào từng kịch bản).",
+    "Viết ĐỦ CHÍNH XÁC 3 kịch bản KHÁC NHAU, mỗi kịch bản là 1 heading cấp 2 RIÊNG: `## Kịch bản 1 — <góc khai thác>`, `## Kịch bản 2 — <góc khai thác>`, `## Kịch bản 3 — <góc khai thác>`. KHÔNG dùng heading cấp 3; KHÔNG dừng khi chưa viết xong cả 3.",
     "QUAN TRỌNG NHẤT — mỗi kịch bản phải NHẤN MẠNH RÕ RỆT vào ĐÚNG 1 ĐÒN TÂM LÝ chủ đạo, phân bổ như sau (ghi luôn đòn này vào sau dấu '—' ở heading):",
     "- Kịch bản 1 → **NỖI ĐAU**: khoét thật sâu nỗi đau/nỗi sợ/sự bất lực của người xem, gọi tên đúng cảm giác họ đang chịu đựng để họ thấy 'đúng là mình'. Đây là kịch bản QUAN TRỌNG NHẤT, làm mạnh tay nhất — vì video chạm nỗi đau dễ viral, share & lưu cao.",
     "- Kịch bản 2 → **SỰ ĐỒNG CẢM**: 'mình hiểu mà', kể như người từng trải, vỗ về, khiến người xem thấy được thấu hiểu và không cô đơn.",
     "- Kịch bản 3 → **SỰ TÒ MÒ**: tạo khoảng trống thông tin, hé lộ nửa chừng, giữ bí mật buộc phải xem tới cuối mới có đáp án.",
-    "- Kịch bản 4 → **SỰ KHÓ HIỂU CẦN GIẢI THÍCH**: nêu một điều gây hoang mang/hiểu lầm/trái ngược thường thấy, rồi giải thích cho vỡ lẽ ('à, hóa ra là vậy').",
-    "- Kịch bản 5 → **SỰ MONG ƯỚC**: khơi khao khát, vẽ ra viễn cảnh/kết quả tốt đẹp mà người xem thầm mong, truyền hy vọng và động lực.",
     "Dù mang đòn chủ đạo riêng, MỌI kịch bản vẫn nên chạm nhẹ vào nỗi đau ở phần mở/diễn biến rồi mới đẩy sang đòn chính của nó.",
     "Mỗi kịch bản bám theo nội dung mô tả ở trên, KẾT HỢP các từ cảm xúc đã nêu, và BẮT BUỘC đi theo đúng MẠCH 4 BƯỚC sau (giống mẫu phong cách):",
     "1. **Câu mở đầu (Hook)**: nêu thẳng 1 vấn đề/câu hỏi nhiều mẹ bầu quan tâm — có thể chọn/biến tấu từ 5 hook ở trên. BẮT BUỘC chứa ít nhất 1 trong các từ tạo điểm nhấn: \"Đừng\", \"Trước khi\", \"Nếu\", \"Vẫn\", \"Hóa ra\".",

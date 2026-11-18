@@ -9,7 +9,7 @@ export default function AdamPage() {
       <PageHeader
         icon={Lightbulb}
         title="Kịch bản Adam"
-        subtitle="Từ câu hook + mô tả nội dung + từ cảm xúc → 5 hook ngắn & 5 kịch bản voice 35–50 giây."
+        subtitle="Từ câu hook + mô tả nội dung + từ cảm xúc → 5 hook ngắn & 3 kịch bản voice 35–50 giây."
       />
       <AdamForm />
     </FadeIn>

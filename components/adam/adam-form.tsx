@@ -169,7 +169,7 @@ export function AdamForm() {
         return;
       }
 
-      // Bước 2: viết 5 kịch bản, bám theo hook vừa tạo.
+      // Bước 2: viết 3 kịch bản, bám theo hook vừa tạo.
       const scripts = await streamStep(
         token,
         { desiredHook, summary, emotionWords, mode: "scripts", hooks },
@@ -282,7 +282,7 @@ export function AdamForm() {
             <div className="mb-4 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Lightbulb className="size-4 text-primary" />
-                5 hook đề xuất &amp; 5 kịch bản
+                5 hook đề xuất &amp; 3 kịch bản
                 {streaming && (
                   <Loader2 className="size-3.5 animate-spin text-primary" />
                 )}
@@ -342,7 +342,7 @@ export function AdamForm() {
               Nhập mô tả nội dung (và câu hook đang phân vân nếu có), chọn từ cảm
               xúc rồi bấm{" "}
               <span className="font-medium text-foreground">Tạo content</span>.
-              AI sẽ gợi ý 5 hook ngắn và 5 kịch bản voice 35–50 giây.
+              AI sẽ gợi ý 5 hook ngắn và 3 kịch bản voice 35–50 giây.
             </p>
           </CardContent>
         </Card>
