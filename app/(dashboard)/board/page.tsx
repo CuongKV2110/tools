@@ -1,18 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { toast } from "sonner";
 import { Search, Plus, KanbanSquare } from "lucide-react";
-import { useContents, updateContent, deleteContent } from "@/hooks/use-contents";
+import {
+  useContents,
+  updateContent,
+  deleteContent,
+  createContent,
+} from "@/hooks/use-contents";
+import { useAuth } from "@/context/AuthContext";
 import { ContentBoard } from "@/components/content/content-board";
 import { PageHeader } from "@/components/layout/page-header";
 import { CONCEPTS } from "@/lib/concepts";
-import { statusMeta } from "@/lib/constants";
+import {
+  statusMeta,
+  DEFAULT_CONTENT_MODEL,
+  countWords,
+  cleanTitle,
+} from "@/lib/constants";
 import type { ContentStatus } from "@/types";
-import { buttonVariants, Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -33,10 +44,68 @@ import {
 
 export default function BoardPage() {
   const { contents, loading } = useContents();
+  const { user } = useAuth();
 
   const [search, setSearch] = useState("");
   const [concept, setConcept] = useState<string>("all");
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+
+  // Tạo content thủ công (nhập tay kịch bản + caption + hashtag).
+  const [createOpen, setCreateOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [script, setScript] = useState("");
+  const [caption, setCaption] = useState("");
+  const [hashtag, setHashtag] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  function resetCreateForm() {
+    setTitle("");
+    setScript("");
+    setCaption("");
+    setHashtag("");
+  }
+
+  async function handleCreate() {
+    if (!user) {
+      toast.error("Vui lòng đăng nhập lại.");
+      return;
+    }
+    if (!script.trim()) {
+      toast.error("Hãy nhập nội dung kịch bản.");
+      return;
+    }
+    const parts = [script.trim()];
+    if (caption.trim()) parts.push(`**📝 Caption:** ${caption.trim()}`);
+    if (hashtag.trim()) parts.push(`**#️⃣ Hashtag:** ${hashtag.trim()}`);
+    const body = parts.join("\n\n");
+
+    setSaving(true);
+    try {
+      await createContent({
+        ownerId: user.uid,
+        kind: "script",
+        title: cleanTitle(title) || "Kịch bản",
+        rawInput: caption.trim() || script.trim().slice(0, 200),
+        body,
+        personaId: "",
+        conceptId: "",
+        formula: "",
+        tone: "friendly",
+        length: "short",
+        status: "idea",
+        publicUrl: null,
+        wordCount: countWords(body),
+        model: DEFAULT_CONTENT_MODEL,
+      });
+      toast.success("Đã thêm vào Quản lý nội dung.");
+      resetCreateForm();
+      setCreateOpen(false);
+    } catch {
+      toast.error("Không thể lưu nội dung.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -80,10 +149,10 @@ export default function BoardPage() {
         title="Quản lý Content"
         subtitle="Kéo-thả thẻ giữa các cột để đổi trạng thái công việc."
       >
-        <Link href="/create" className={cn(buttonVariants())}>
+        <Button onClick={() => setCreateOpen(true)}>
           <Plus className="size-4" />
           Tạo Content
-        </Link>
+        </Button>
       </PageHeader>
 
       {/* Toolbar */}
@@ -139,10 +208,10 @@ export default function BoardPage() {
             <p className="text-sm text-muted-foreground">
               Bạn chưa tạo nội dung nào.
             </p>
-            <Link href="/create" className={cn(buttonVariants())}>
+            <Button onClick={() => setCreateOpen(true)}>
               <Plus className="size-4" />
               Tạo nội dung đầu tiên
-            </Link>
+            </Button>
           </CardContent>
         </Card>
       ) : (
@@ -171,6 +240,83 @@ export default function BoardPage() {
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
               Xoá
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tạo content thủ công */}
+      <Dialog
+        open={createOpen}
+        onOpenChange={(o) => {
+          setCreateOpen(o);
+          if (!o) resetCreateForm();
+        }}
+      >
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Tạo content mới</DialogTitle>
+            <DialogDescription>
+              Nhập kịch bản, caption và hashtag để lưu vào Quản lý nội dung.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="c-title">Tiêu đề</Label>
+              <Input
+                id="c-title"
+                placeholder="Ví dụ: Bầu ăn được mì cay không?"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="c-script">Kịch bản *</Label>
+              <Textarea
+                id="c-script"
+                rows={8}
+                placeholder="Dán hoặc gõ nội dung kịch bản video (mỗi câu một dòng)…"
+                value={script}
+                onChange={(e) => setScript(e.target.value)}
+                className="resize-y"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="c-caption">Caption</Label>
+              <Textarea
+                id="c-caption"
+                rows={3}
+                placeholder="Caption đăng TikTok/Reels…"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                className="resize-y"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="c-hashtag">Hashtag</Label>
+              <Input
+                id="c-hashtag"
+                placeholder="#cuongtaplamchong #chongchamvobau #mebau …"
+                value={hashtag}
+                onChange={(e) => setHashtag(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCreateOpen(false)}
+              disabled={saving}
+            >
+              Huỷ
+            </Button>
+            <Button onClick={handleCreate} disabled={saving}>
+              {saving ? "Đang lưu…" : "Lưu vào board"}
             </Button>
           </DialogFooter>
         </DialogContent>
