@@ -1,7 +1,11 @@
 import type { NextRequest } from "next/server";
 import { streamText } from "ai";
 import { contentModel, isAIConfigured } from "@/lib/ai";
-import { buildAdamSystemPrompt, buildAdamPrompt } from "@/lib/prompts";
+import {
+  buildAdamSystemPrompt,
+  buildAdamHooksPrompt,
+  buildAdamScriptsPrompt,
+} from "@/lib/prompts";
 import { verifyRequest } from "@/lib/auth-helpers";
 import type { AdamScriptRequest } from "@/types";
 
@@ -30,10 +34,13 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  const isScripts = body.mode === "scripts";
   const result = streamText({
     model: contentModel,
     system: buildAdamSystemPrompt(),
-    prompt: buildAdamPrompt(body),
+    prompt: isScripts
+      ? buildAdamScriptsPrompt(body)
+      : buildAdamHooksPrompt(body),
     temperature: 0.85,
     maxOutputTokens: 8192,
   });

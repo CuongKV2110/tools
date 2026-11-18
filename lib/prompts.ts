@@ -213,16 +213,17 @@ export function buildAdamSystemPrompt(): string {
   ].join("\n\n");
 }
 
-export function buildAdamPrompt(req: AdamScriptRequest): string {
+/** Phần đầu dùng chung cho cả 2 bước: hook mong muốn + mô tả + cảm xúc + niche. */
+function adamContext(req: AdamScriptRequest): string[] {
   const emotions = req.emotionWords?.trim();
   return [
     req.desiredHook?.trim()
       ? [
           "CÂU HOOK MONG MUỐN CỦA NGƯỜI DÙNG (đây là CHỦ ĐỀ / GÓC HOOK GỐC — CỰC KỲ QUAN TRỌNG):",
           req.desiredHook.trim(),
-          "→ Cả 5 câu hook BẮT BUỘC phải CÙNG CHỦ ĐỀ, CÙNG GÓC KHAI THÁC với câu trên; chỉ viết lại cho sắc hơn, hấp dẫn hơn. TUYỆT ĐỐI không đi lạc sang chủ đề mẹ bầu khác. Nếu câu gốc là một ý tổng quát (vd 'Tổng kết tam cá nguyệt thứ 1') thì mọi hook phải xoay quanh đúng ý đó (nhìn lại/tổng kết/điều cần nhớ của giai đoạn đó).",
+          "→ Mọi hook & kịch bản BẮT BUỘC phải CÙNG CHỦ ĐỀ, CÙNG GÓC KHAI THÁC với câu trên; chỉ viết lại cho sắc hơn, hấp dẫn hơn. TUYỆT ĐỐI không đi lạc sang chủ đề mẹ bầu khác. Nếu câu gốc là một ý tổng quát (vd 'Tổng kết tam cá nguyệt thứ 1') thì xoay quanh đúng ý đó (nhìn lại/tổng kết/điều cần nhớ của giai đoạn đó).",
         ].join("\n")
-      : "CÂU HOOK MONG MUỐN: (người dùng chưa nhập — hãy tự nghĩ hook mạnh nhất bám theo phần mô tả nội dung bên dưới).",
+      : "CÂU HOOK MONG MUỐN: (người dùng chưa nhập — hãy tự nghĩ góc mạnh nhất bám theo phần mô tả nội dung bên dưới).",
     "",
     "MÔ TẢ SƠ BỘ NỘI DUNG (diễn biến, hướng kịch bản, cái kết mong muốn):",
     req.summary?.trim() || "(không nêu cụ thể — tự chọn góc khai thác mạnh nhất hợp lý)",
@@ -233,17 +234,35 @@ export function buildAdamPrompt(req: AdamScriptRequest): string {
     "",
     "CHỦ ĐỀ KÊNH (bắt buộc bám sát): mẹ bầu, mẹ bỉm, mang thai, các vấn đề trong thai kỳ. Mọi hook và kịch bản phải nằm trong thế giới này.",
     "",
-    "Hãy trả về ĐÚNG 2 PHẦN theo thứ tự, dùng heading Markdown:",
-    "",
+  ];
+}
+
+/** BƯỚC 1 — chỉ tạo 5 câu hook (nhẹ, nhanh). */
+export function buildAdamHooksPrompt(req: AdamScriptRequest): string {
+  return [
+    ...adamContext(req),
     "## 5 câu hook đề xuất",
-    "Viết ĐÚNG 5 câu hook, để nói trong 3 GIÂY ĐẦU của video.",
+    "Viết ĐÚNG 5 câu hook, để nói trong 3 GIÂY ĐẦU của video. CHỈ trả về phần hook này, KHÔNG viết kịch bản.",
     "- ƯU TIÊN SỐ 1: nếu người dùng có nhập 'Câu hook mong muốn' ở trên, cả 5 hook phải BÁM CHẶT đúng chủ đề/góc đó (chỉ là 5 cách diễn đạt khác nhau cho cùng ý). Chỉ khi KHÔNG có câu hook mong muốn mới tự chọn góc từ phần mô tả nội dung.",
     "- Mỗi hook CỰC NGẮN: khoảng 8–12 từ, đọc hết dưới 3 giây.",
     "- QUAN TRỌNG: mỗi hook phải NÊU NGAY 1 VẤN ĐỀ / CÂU HỎI mà rất nhiều mẹ bầu quan tâm (kiểu 'Bầu có ăn được … không mọi người?', 'Bầu mấy tháng thì…?', 'Nghén … có sao không?') để ai đang mang thai lướt tới là phải dừng lại.",
     "- BẮT BUỘC: mỗi hook phải CHỨA ít nhất 1 trong các TỪ KHÓA TẠO ĐIỂM NHẤN sau (ưu tiên đặt ở đầu câu, dùng xen kẽ cho đa dạng): \"Đừng\", \"Trước khi\", \"Nếu\", \"Vẫn\", \"Hóa ra\".",
     "- 5 hook phải KHÁC KIỂU nhau (câu hỏi lo lắng, tình huống dở khóc dở cười, cảnh báo sai lầm…). Đánh số 1–5, mỗi hook một dòng, KHÔNG giải thích.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+/** BƯỚC 2 — viết 5 kịch bản, dựa trên 5 hook đã tạo ở bước 1. */
+export function buildAdamScriptsPrompt(req: AdamScriptRequest): string {
+  return [
+    ...adamContext(req),
+    req.hooks?.trim()
+      ? "5 CÂU HOOK ĐÃ TẠO Ở BƯỚC TRƯỚC (mỗi kịch bản mở đầu bằng 1 trong số này, có thể biến tấu):\n" +
+        req.hooks.trim()
+      : "",
     "",
-    "PHẦN 2 — 5 KỊCH BẢN VIDEO. KHÔNG viết heading tổng bao ngoài; đi thẳng vào từng kịch bản.",
+    "Bây giờ CHỈ viết 5 KỊCH BẢN VIDEO (KHÔNG lặp lại danh sách hook, KHÔNG viết heading tổng bao ngoài; đi thẳng vào từng kịch bản).",
     "Viết ĐỦ CHÍNH XÁC 5 kịch bản KHÁC NHAU, mỗi kịch bản là 1 heading cấp 2 RIÊNG: `## Kịch bản 1 — <góc khai thác>`, `## Kịch bản 2 — <góc khai thác>`, … đến `## Kịch bản 5 — <góc khai thác>`. KHÔNG dùng heading cấp 3; KHÔNG dừng khi chưa viết xong cả 5.",
     "QUAN TRỌNG NHẤT — mỗi kịch bản phải NHẤN MẠNH RÕ RỆT vào ĐÚNG 1 ĐÒN TÂM LÝ chủ đạo, phân bổ như sau (ghi luôn đòn này vào sau dấu '—' ở heading):",
     "- Kịch bản 1 → **NỖI ĐAU**: khoét thật sâu nỗi đau/nỗi sợ/sự bất lực của người xem, gọi tên đúng cảm giác họ đang chịu đựng để họ thấy 'đúng là mình'. Đây là kịch bản QUAN TRỌNG NHẤT, làm mạnh tay nhất — vì video chạm nỗi đau dễ viral, share & lưu cao.",
